@@ -201,17 +201,19 @@
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
-        const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-        if (!SUPABASE_URL || SUPABASE_URL === 'https://your-project.supabase.co' || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'your-anon-key') {
+        const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
+
+        if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
             document.body.innerHTML = `
                 <div class="min-h-screen flex items-center justify-center bg-slate-50 p-6 text-center">
                     <div class="max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-red-100">
                         <div class="text-4xl mb-4">⚙️</div>
                         <h1 class="text-xl font-bold text-slate-800 mb-2">Configuração Necessária</h1>
                         <p class="text-slate-500 text-sm">As chaves do Supabase não foram encontradas no ambiente.</p>
-                        <p class="text-slate-400 text-xs mt-4 italic">Certifique-se de configurar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.</p>
+                        <p class="text-slate-400 text-xs mt-4 italic">Certifique-se de configurar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no menu Settings.</p>
                     </div>
                 </div>
             `;
@@ -478,6 +480,7 @@
             const originalText = btn.innerHTML;
             
             try {
+                console.log("Starting event submission...");
                 errorBox.classList.add('hidden');
                 btn.disabled = true;
                 btn.textContent = 'Salvando...';
@@ -488,9 +491,11 @@
                 const max = parseInt(document.getElementById('event-max').value);
 
                 if (!slugInput) throw new Error("O slug é obrigatório.");
+                if (!currentUser) throw new Error("Usuário não autenticado. Tente fazer login novamente.");
 
+                console.log("Inserting event into DB...");
                 // Create Event
-                const { data: event, error: eventError } = await supabase
+                const insertResponse = await supabase
                     .from('eventos')
                     .insert([{ 
                         nome: name, 
@@ -502,14 +507,23 @@
                     .select()
                     .single();
 
+                const eventError = insertResponse.error;
+                const event = insertResponse.data;
+
                 if (eventError) {
+                    console.error("DB Insert Error:", eventError);
                     if (eventError.message.includes('unique')) {
                         throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
                     }
+                    if (eventError.code === '42501') {
+                        throw new Error("Permissão negada (RLS). Verifique se as tabelas e políticas de segurança foram criadas corretamente.");
+                    }
                     throw eventError;
                 }
-                if (!event) throw new Error("Falha ao recuperar o evento criado.");
+                
+                if (!event) throw new Error("O servidor não retornou os dados do evento criado.");
 
+                console.log("Event created, inserting prizes...", event.id);
                 // Create Prizes
                 const prizeRows = document.querySelectorAll('.prize-row');
                 const prizes = Array.from(prizeRows)
@@ -528,14 +542,18 @@
 
                 if (prizes.length > 0) {
                     const { error: prizesError } = await supabase.from('premios').insert(prizes);
-                    if (prizesError) console.warn("Evento criado, mas erro nos prêmios:", prizesError.message);
+                    if (prizesError) {
+                        console.error("Prizes Insert Error:", prizesError);
+                        console.warn("Evento criado, mas erro nos prêmios:", prizesError.message);
+                    }
                 }
 
+                console.log("Submission complete success!");
                 closeModal();
                 await loadEvents();
             } catch (err) {
-                console.error("Erro na submissão:", err);
-                errorBox.textContent = err.message || "Erro desconhecido ao salvar. Tente novamente.";
+                console.error("Erro fatal na submissão:", err);
+                errorBox.textContent = err.message || "Erro inesperado ao salvar. Verifique o console ou tente novamente.";
                 errorBox.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerHTML = originalText;

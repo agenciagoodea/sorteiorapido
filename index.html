@@ -78,17 +78,30 @@
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
-        const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-        if (!SUPABASE_URL || SUPABASE_URL === 'https://your-project.supabase.co' || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'your-anon-key') {
+        const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
+
+        if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
             document.body.innerHTML = `
                 <div class="min-h-screen flex items-center justify-center bg-slate-50 p-6 text-center">
-                    <div class="max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-red-100">
-                        <div class="text-4xl mb-4">⚙️</div>
-                        <h1 class="text-xl font-bold text-slate-800 mb-2">Configuração Necessária</h1>
-                        <p class="text-slate-500 text-sm">As chaves do Supabase não foram encontradas no ambiente.</p>
-                        <p class="text-slate-400 text-xs mt-4 italic">Certifique-se de configurar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.</p>
+                    <div class="max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-blue-100">
+                        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </div>
+                        <h1 class="text-2xl font-black text-slate-800 mb-2 leading-tight">Configuração Necessária</h1>
+                        <p class="text-slate-500 text-sm mb-6">As chaves do Supabase não foram encontradas no ambiente de execução.</p>
+                        <div class="bg-slate-50 p-6 rounded-2xl text-left border border-slate-100 mb-8">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 italic">Como resolver:</p>
+                            <ol class="text-xs text-slate-600 space-y-3 leading-relaxed">
+                                <li class="flex gap-2"><span>1.</span><span>Abra o menu <b>Settings</b> (ícone da engrenagem à esquerda).</span></li>
+                                <li class="flex gap-2"><span>2.</span><span>Adicione <b>VITE_SUPABASE_URL</b> com sua URL do projeto.</span></li>
+                                <li class="flex gap-2"><span>3.</span><span>Adicione <b>VITE_SUPABASE_ANON_KEY</b> com sua chave anônima.</span></li>
+                                <li class="flex gap-2"><span>4.</span><span>Se estiver no Vercel, adicione estas variáveis no painel da Vercel.</span></li>
+                            </ol>
+                        </div>
+                        <p class="text-[9px] text-slate-300 font-bold uppercase tracking-widest leading-relaxed">Certifique-se de preencher as chaves corretamente para ativar a conexão com o banco de dados.</p>
                     </div>
                 </div>
             `;

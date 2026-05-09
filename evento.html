@@ -139,10 +139,12 @@
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
-        const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-        if (!SUPABASE_URL || SUPABASE_URL === 'https://your-project.supabase.co' || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'your-anon-key') {
+        const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
+
+        if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
             document.body.innerHTML = `
                 <div class="min-h-screen flex items-center justify-center bg-slate-50 p-6 text-center">
                     <div class="max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-red-100">
