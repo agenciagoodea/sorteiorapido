@@ -7,197 +7,149 @@
     <link rel="stylesheet" href="/src/index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .draw-modal { transition: opacity 0.5s ease; }
-        @keyframes roll { from { transform: translateY(0); } to { transform: translateY(-50%); } }
-        .roll-animation { animation: roll 3s cubic-bezier(0.1, 0, 0.1, 1) forwards; }
+        .mini-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 9999px; animation: spin .7s linear infinite; }
+        .vibrate { animation: vibrate .11s linear infinite; }
+        .glow-ring { box-shadow: 0 0 0 3px rgba(250, 204, 21, .35), 0 0 25px rgba(250, 204, 21, .45); }
+        .draw-bg { background: radial-gradient(circle at 20% 20%, #3b0764 0%, #1e1b4b 35%, #0f172a 100%); }
+        .particle { position: absolute; width: 3px; height: 3px; border-radius: 9999px; background: rgba(255,255,255,.85); animation: float 14s linear infinite; }
+        #toast-container .toast { opacity: 0; transform: translateY(10px); transition: .25s ease; }
+        #toast-container .toast.show { opacity: 1; transform: translateY(0); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes vibrate { 0%{transform:translate(0)} 25%{transform:translate(1px,-1px)} 50%{transform:translate(-1px,1px)} 75%{transform:translate(1px,1px)} 100%{transform:translate(0)} }
+        @keyframes float { 0%{ transform: translateY(0) scale(1); opacity:.2 } 50%{ opacity:1 } 100%{ transform: translateY(-120vh) scale(1.8); opacity:0 } }
+        @media print {
+            body * { visibility: hidden !important; }
+            #printable-results, #printable-results * { visibility: visible !important; }
+            #printable-results { position: absolute; inset: 0; background: white; color: black; padding: 20px; }
+            #printable-results .no-print { display: none !important; }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
-
-    <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+<body class="bg-slate-100 text-slate-900 min-h-screen">
+    <header class="h-20 bg-white border-b border-slate-200 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm">
         <div class="flex items-center gap-4">
-            <button onclick="window.location.href='/dashboard.html'" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition-all border border-slate-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
+            <button onclick="window.location.href='/dashboard.html'" class="w-10 h-10 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100">←</button>
             <div>
-                <h1 id="event-title-header" class="text-xl font-bold text-slate-800">Gerenciar Evento</h1>
-                <p id="event-status-display" class="text-xs text-slate-500 font-medium uppercase tracking-widest">Carregando...</p>
+                <h1 id="event-title-header" class="text-lg sm:text-xl font-black text-slate-800">Gerenciar Evento</h1>
+                <p id="event-status-display" class="text-xs text-slate-500 font-semibold uppercase tracking-widest">Carregando...</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <span id="event-status-badge" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">STATUS</span>
-            <button id="btn-logout" class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Sair da Conta">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            </button>
+            <span id="event-status-badge" class="px-3 py-1 rounded-full text-xs font-black tracking-wide bg-slate-100">STATUS</span>
+            <button id="btn-logout" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-red-50">Sair</button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-8 py-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
-            <!-- Sidebar: Info & QR -->
-            <div class="lg:col-span-4 space-y-8">
-                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">Link de Divulgação</h3>
-                    <div id="qrcode" class="flex justify-center mb-8 bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100 shadow-inner"></div>
-                    <div class="space-y-4">
-                        <div class="group">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">URL Pública</label>
-                            <input type="text" id="public-link-input" readonly class="w-full text-xs bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/10">
-                        </div>
-                        <button id="btn-copy-link" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-100 transition-all transform active:scale-95">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
-                            Copiar Link do Evento
-                        </button>
-                    </div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <aside class="lg:col-span-4 space-y-6">
+                <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Link de divulgação</h3>
+                    <div id="qrcode" class="flex justify-center p-4 bg-slate-50 rounded-2xl border border-slate-100"></div>
+                    <input id="public-link-input" readonly class="mt-4 w-full text-xs p-3 rounded-xl border border-slate-200 bg-slate-50">
+                    <button id="btn-copy-link" class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold">🔗 Copiar Link</button>
+                </section>
+
+                <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
+                    <button id="btn-toggle-status" class="w-full bg-slate-900 hover:bg-slate-950 text-white py-3 rounded-xl font-bold transition">Encerrar Inscrições</button>
+                    <button id="btn-export-csv" class="w-full bg-white border border-slate-200 hover:bg-slate-50 py-3 rounded-xl font-bold text-slate-700">Exportar Inscritos</button>
+                </section>
+            </aside>
+
+            <section class="lg:col-span-8 space-y-6">
+                <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+                    <h2 class="text-2xl sm:text-3xl font-black">Sorteio inteligente por prêmios</h2>
+                    <p class="text-blue-100 mt-2">Faça o sorteio em sequência com visual de palco e revelação de ganhadores.</p>
+                    <button id="btn-start-draw" class="mt-5 bg-white text-blue-800 px-6 py-3 rounded-2xl font-black hover:bg-blue-50 transition">🎲 Iniciar Sorteio</button>
                 </div>
 
-                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">Configurações Rápidas</h3>
-                    <div class="space-y-3">
-                        <button id="btn-toggle-status" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-slate-200 transform active:scale-95 flex items-center justify-center gap-2">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>Encerrar Inscrições</span>
-                        </button>
-                        <button id="btn-export-csv" class="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            Exportar Inscritos
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content: Participants -->
-            <div class="lg:col-span-8 space-y-10">
-                <!-- Draw Banner -->
-                <div id="draw-banner" class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white p-10 rounded-[2.5rem] shadow-2xl shadow-blue-200 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden relative group">
-                    <div class="z-10 text-center md:text-left">
-                        <div class="inline-block px-4 py-1 bg-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 backdrop-blur-sm border border-white/10">Fase Final</div>
-                        <h2 class="text-3xl font-black mb-3 tracking-tight">O Sorteio está pronto!</h2>
-                        <p class="text-blue-100 opacity-80 mb-8 max-w-sm font-medium">Capture a atenção de todos com nossa animação de sorteio em tempo real.</p>
-                        <button id="btn-start-draw" class="bg-white text-blue-700 px-10 py-4 rounded-2xl font-black text-lg hover:bg-blue-50 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-900/20 flex items-center gap-3">
-                            <span class="text-2xl">🎲</span>
-                            <span>INICIAR SORTEIO AGORA</span>
-                        </button>
-                    </div>
-                    <div class="opacity-10 absolute -right-6 -bottom-6 transform rotate-12 group-hover:rotate-45 transition-transform duration-1000">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-64 w-64" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                        <div class="flex items-center gap-3">
-                             <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                             </div>
-                             <h3 class="font-black text-xl text-slate-800">Participantes Inscritos</h3>
-                        </div>
-                        <div class="flex flex-col items-end">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ocupação</span>
-                            <span class="font-black text-slate-700 text-lg"><span id="part-count">0</span> / <span id="event-max-count">0</span></span>
-                        </div>
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-xl font-black">Participantes</h3>
+                        <p class="text-sm font-bold text-slate-600"><span id="part-count">0</span>/<span id="event-max-count">0</span></p>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-sm">
                             <thead>
-                                <tr class="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                                    <th class="px-8 py-5"># Nº Ticket</th>
-                                    <th class="px-8 py-5">Nome do Candidato</th>
-                                    <th class="px-8 py-5">WhatsApp</th>
-                                    <th class="px-8 py-5">Data Inscrição</th>
+                                <tr class="text-left text-slate-500 bg-slate-50">
+                                    <th class="px-4 py-3">Número</th>
+                                    <th class="px-4 py-3">Nome</th>
+                                    <th class="px-4 py-3">WhatsApp</th>
+                                    <th class="px-4 py-3">Data</th>
                                 </tr>
                             </thead>
-                            <tbody id="participants-list" class="divide-y divide-slate-100">
-                                <!-- Participants will be listed here -->
-                            </tbody>
+                            <tbody id="participants-list"></tbody>
                         </table>
                     </div>
-                    <div id="no-participants" class="hidden p-20 text-center text-slate-400 italic bg-white">
-                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                             <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                        </div>
-                        <p class="font-medium text-lg text-slate-300">Aguardando as primeiras inscrições...</p>
-                    </div>
+                    <div id="no-participants" class="hidden p-8 text-center text-slate-500">Aguardando inscrições...</div>
                 </div>
-            </div>
-
+            </section>
         </div>
     </main>
 
-    <!-- Draw Modal (Full Screen Overlay) -->
-    <div id="draw-modal" class="draw-modal fixed inset-0 bg-slate-900 z-[100] hidden flex flex-col items-center justify-center p-8 overflow-hidden">
-        <div id="confetti-canvas" class="absolute inset-0 pointer-events-none"></div>
-
-        <div id="raffle-container" class="w-full max-w-4xl text-center space-y-10">
-            <!-- Stage 1: Intro -->
-            <div id="raffle-intro" class="space-y-6 opacity-0 translate-y-4 transition-all duration-700">
-                <h2 class="text-4xl md:text-6xl font-black text-white leading-tight">O grande momento chegou!</h2>
-                <p class="text-slate-400 text-xl">Sorteando <span id="raffle-prize-total" class="text-blue-400 font-bold">0</span> prêmios...</p>
-                <button id="btn-confirm-start" class="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-2xl font-bold text-xl shadow-2xl shadow-blue-900/50">
-                    Começar Sorteio Agora!
-                </button>
-            </div>
-
-            <!-- Stage 2: Drawing -->
-            <div id="raffle-active" class="hidden space-y-12">
-                <div class="space-y-2">
-                    <p class="text-blue-400 font-bold tracking-widest uppercase text-sm">Sorteando agora:</p>
-                    <h3 id="raffle-prize-name" class="text-3xl font-bold text-white">Carregando prêmio...</h3>
-                    <p id="raffle-prize-partner" class="text-slate-500 font-medium">Parceiro</p>
+    <div id="draw-modal" class="hidden fixed inset-0 z-[100] draw-bg text-white overflow-y-auto">
+        <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 min-h-screen flex items-center justify-center p-4 sm:p-8">
+            <div class="w-full max-w-5xl">
+                <div class="flex justify-end mb-3">
+                    <button id="btn-close-draw" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl">Fechar</button>
                 </div>
 
-                <!-- Roulete -->
-                <div class="relative h-32 md:h-48 flex items-center justify-center overflow-hidden bg-slate-800 rounded-3xl border-4 border-slate-700 shadow-inner">
-                    <div id="roulette-belt" class="absolute flex flex-col items-center py-10 transition-transform duration-100">
-                        <!-- Names injected here -->
-                    </div>
-                    <div class="absolute inset-x-0 h-1/2 bg-gradient-to-b from-slate-800 to-transparent top-0 opacity-80 pointer-events-none"></div>
-                    <div class="absolute inset-x-0 h-1/2 bg-gradient-to-t from-slate-800 to-transparent bottom-0 opacity-80 pointer-events-none"></div>
-                    <div class="absolute h-1 bg-blue-500 w-full z-10 shadow-lg shadow-blue-500/50"></div>
+                <div id="stage-prize" class="hidden bg-white/10 border border-white/15 backdrop-blur-md rounded-3xl p-6 sm:p-8 text-center">
+                    <p class="text-xs uppercase tracking-[0.2em] text-amber-200 font-black mb-3">Etapa 1 • Revelação do prêmio</p>
+                    <div id="stage-prize-image" class="mx-auto w-[200px] h-[200px] rounded-3xl overflow-hidden bg-slate-900/50 border-4 border-amber-300 glow-ring flex items-center justify-center text-5xl">🎁</div>
+                    <h3 id="stage-prize-partner" class="mt-5 text-3xl font-black text-amber-200">Parceiro</h3>
+                    <p id="stage-prize-desc" class="text-lg mt-2">Descrição</p>
+                    <p class="mt-5 text-blue-100">Quem vai ganhar esse prêmio?</p>
+                    <button id="btn-spin" class="mt-5 bg-amber-400 hover:bg-amber-300 text-slate-900 px-8 py-3 rounded-2xl font-black text-lg">🎲 Girar!</button>
                 </div>
 
-                <div id="raffle-winner-reveal" class="hidden transform scale-50 opacity-0 transition-all duration-500">
-                    <div class="bg-white p-10 rounded-[3rem] shadow-2xl inline-block">
-                        <p class="text-slate-400 font-bold uppercase tracking-widest mb-2">Ganhador(a)</p>
-                        <h2 id="winner-name" class="text-4xl md:text-6xl font-black text-slate-900 mb-2">NOME DO GANHADOR</h2>
-                        <p id="winner-phone" class="text-xl font-mono text-slate-500">WHATSAPP</p>
-                    </div>
-                    <div class="mt-8 flex justify-center gap-4">
-                        <button id="btn-next-raffle" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-blue-500/20">
-                            Próximo Prêmio
-                        </button>
+                <div id="stage-roulette" class="hidden bg-white/10 border border-white/15 backdrop-blur-md rounded-3xl p-8 text-center">
+                    <p class="text-xs uppercase tracking-[0.2em] text-blue-100 font-black mb-3">Etapa 2 • Roleta</p>
+                    <div id="roulette-box" class="mx-auto max-w-md bg-slate-900/60 border border-blue-300/30 rounded-3xl p-8">
+                        <p class="text-sm text-slate-300 mb-3">Número sorteando...</p>
+                        <p id="roulette-number" class="text-7xl font-black tracking-tight">#000</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Stage 3: Results -->
-            <div id="raffle-results" class="hidden w-full max-w-2xl mx-auto space-y-8 h-full flex flex-col">
-                <h2 class="text-3xl font-bold text-white">Ganhadores do Evento</h2>
-                <div id="results-list" class="bg-slate-800 rounded-3xl border border-slate-700 divide-y divide-slate-700 overflow-y-auto max-h-[50vh]">
-                    <!-- Winners list -->
+                <div id="stage-winner" class="hidden bg-white text-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl">
+                    <p class="text-xs uppercase tracking-[0.2em] text-blue-700 font-black mb-4">Etapa 3 • Ganhador</p>
+                    <div class="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 items-center">
+                        <div id="winner-prize-image" class="w-[200px] h-[200px] mx-auto rounded-2xl overflow-hidden bg-slate-100 flex items-center justify-center text-4xl">🎁</div>
+                        <div class="text-center md:text-left">
+                            <p id="winner-number" class="text-7xl font-black text-blue-700 leading-none">#000</p>
+                            <h3 id="winner-name" class="text-3xl font-black mt-2">Nome do ganhador</h3>
+                            <p id="winner-phone" class="text-slate-500 mt-1">(00) 0****-**00</p>
+                        </div>
+                    </div>
+                    <button id="btn-next-prize" class="hidden mt-6 w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl font-black">Próximo Prêmio →</button>
                 </div>
-                <button id="btn-close-results" class="w-full bg-white text-slate-900 py-4 rounded-2xl font-bold text-lg hover:bg-slate-100 transition-all">
-                    Encerrar e Salvar Resultados
-                </button>
+
+                <div id="stage-final" class="hidden bg-white rounded-3xl p-6 sm:p-8 text-slate-900">
+                    <div id="printable-results">
+                        <h3 class="text-3xl font-black mb-5">Resultado final do sorteio</h3>
+                        <div id="final-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+                            <button id="btn-export-pdf" class="bg-slate-900 text-white py-3 rounded-xl font-black">Exportar resultado em PDF</button>
+                            <button id="btn-save-results" class="bg-emerald-600 text-white py-3 rounded-xl font-black">Salvar resultados</button>
+                            <button id="btn-finish" class="bg-blue-700 text-white py-3 rounded-xl font-black">Fechar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[120] space-y-2 w-[92vw] max-w-sm"></div>
 
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        // Robust environment variable access
         const getEnv = (key) => {
             if (typeof window !== 'undefined' && window[key]) return window[key];
             if (typeof process !== 'undefined' && process.env && process.env[key]) return process.env[key];
@@ -207,28 +159,14 @@
 
         const SUPABASE_URL = getEnv('VITE_SUPABASE_URL');
         const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY');
-
         const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
-
         if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
-            document.body.innerHTML = `
-                <div class="min-h-screen flex items-center justify-center bg-slate-50 p-6 text-center">
-                    <div class="max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-red-100">
-                        <div class="text-4xl mb-4">⚙️</div>
-                        <h1 class="text-xl font-bold text-slate-800 mb-2">Configuração Necessária</h1>
-                        <p class="text-slate-500 text-sm">As chaves do Supabase não foram encontradas no ambiente.</p>
-                        <p class="text-slate-400 text-xs mt-4 italic">Certifique-se de configurar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.</p>
-                    </div>
-                </div>
-            `;
-            throw new Error("Supabase configuration missing");
+            document.body.innerHTML = '<div class="min-h-screen flex items-center justify-center">Configuração Supabase ausente.</div>';
+            throw new Error('Supabase configuration missing');
         }
 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const eventId = urlParams.get('id');
-
+        const eventId = new URLSearchParams(window.location.search).get('id');
         if (!eventId) window.location.href = '/dashboard.html';
 
         let currentEvent = null;
@@ -237,93 +175,95 @@
         let winners = [];
         let currentPrizeIndex = 0;
 
-        const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) window.location.href = '/index.html';
-            loadEventData();
+        const showToast = (message, type = 'info') => {
+            const container = document.getElementById('toast-container');
+            const colors = { success: 'bg-emerald-600', error: 'bg-red-600', info: 'bg-slate-800' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${colors[type] || colors.info} text-white px-4 py-3 rounded-xl shadow-xl text-sm font-semibold`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 250); }, 2600);
+        };
+
+        const setBtnLoading = (btn, loading, label = 'Processando...') => {
+            if (!btn) return;
+            if (loading) {
+                btn.dataset.originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<span class="mini-spinner"></span><span>${label}</span>`;
+                return;
+            }
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.originalHtml || btn.innerHTML;
+        };
+
+        const maskPhone = (value = '') => {
+            const digits = value.replace(/\D/g, '');
+            if (digits.length < 10) return value || '-';
+            const ddd = digits.slice(0,2);
+            const prefix = digits.length === 11 ? digits.slice(2,3) : '';
+            const last2 = digits.slice(-2);
+            return `(${ddd}) ${prefix}****-**${last2}`;
+        };
+
+        const makeParticles = () => {
+            const root = document.getElementById('particles');
+            root.innerHTML = '';
+            for (let i = 0; i < 80; i++) {
+                const el = document.createElement('span');
+                el.className = 'particle';
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.bottom = `${Math.random() * 20}%`;
+                el.style.animationDelay = `${Math.random() * 8}s`;
+                el.style.opacity = (Math.random() * 0.8).toFixed(2);
+                root.appendChild(el);
+            }
         };
 
         const loadEventData = async () => {
-            const { data: event, error } = await supabase
-                .from('eventos')
-                .select('*')
-                .eq('id', eventId)
-                .single();
-
+            const { data: event, error } = await supabase.from('eventos').select('*').eq('id', eventId).single();
             if (error || !event) {
-                alert("Erro ao carregar evento.");
+                showToast('Erro ao carregar evento.', 'error');
                 window.location.href = '/dashboard.html';
                 return;
             }
-
             currentEvent = event;
+
             document.getElementById('event-title-header').textContent = event.nome;
             document.getElementById('event-max-count').textContent = event.max_numeros;
 
+            const cfg = {
+                aberto: { badge: 'bg-emerald-100 text-emerald-700', text: 'Inscrições abertas', status: 'Recebendo inscrições' },
+                encerrado: { badge: 'bg-amber-100 text-amber-700', text: 'Inscrições encerradas', status: 'Pronto para sortear' },
+                sorteado: { badge: 'bg-blue-100 text-blue-700', text: 'Sorteado', status: 'Ganhadores definidos' }
+            }[event.status] || { badge: 'bg-slate-100 text-slate-700', text: event.status, status: '' };
+
             const badge = document.getElementById('event-status-badge');
-            const statusDisplay = document.getElementById('event-status-display');
-            
-            const statusConfigs = {
-                'aberto': { 
-                    label: 'Inscrições Abertas', 
-                    badge: 'bg-emerald-100 text-emerald-600',
-                    display: 'Estamos recebendo novos participantes'
-                },
-                'encerrado': { 
-                    label: 'Inscrições Encerradas', 
-                    badge: 'bg-amber-100 text-amber-600',
-                    display: 'Pronto para o sorteio'
-                },
-                'sorteado': { 
-                    label: 'Evento Concluído', 
-                    badge: 'bg-blue-100 text-blue-600',
-                    display: 'Ganhadores já foram definidos'
-                }
-            };
-            
-            const config = statusConfigs[event.status] || { label: event.status, badge: 'bg-slate-100 text-slate-600', display: '' };
-            badge.className = `px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm ${config.badge}`;
-            badge.textContent = config.label;
-            statusDisplay.textContent = config.display;
+            badge.className = `px-3 py-1 rounded-full text-xs font-black tracking-wide ${cfg.badge}`;
+            badge.textContent = cfg.text;
+            document.getElementById('event-status-display').textContent = cfg.status;
 
-            const btnToggle = document.getElementById('btn-toggle-status');
-            if (event.status === 'aberto') {
-                btnToggle.innerHTML = `
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Encerrar Inscrições
-                `;
-                btnToggle.className = "w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-slate-200 transform active:scale-95 flex items-center justify-center gap-2";
-            } else if (event.status === 'encerrado') {
-                btnToggle.innerHTML = `
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Reabrir Inscrições
-                `;
-                btnToggle.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 transform active:scale-95 flex items-center justify-center gap-2";
-            } else {
-                btnToggle.classList.add('hidden');
-                const startDrawBtn = document.getElementById('btn-start-draw');
-                startDrawBtn.innerHTML = `
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    SORTEIO JÁ REALIZADO
-                `;
-                startDrawBtn.disabled = true;
-            }
-
-            // QR Code
             const publicURL = `${window.location.origin}/evento.html?slug=${event.slug}`;
             document.getElementById('public-link-input').value = publicURL;
             document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById("qrcode"), {
-                text: publicURL,
-                width: 160,
-                height: 160,
-                colorDark : "#1e293b",
-                colorLight : "#f8fafc",
-                correctLevel : QRCode.CorrectLevel.H
-            });
+            new QRCode(document.getElementById('qrcode'), { text: publicURL, width: 150, height: 150, colorDark: '#0f172a', colorLight: '#f8fafc', correctLevel: QRCode.CorrectLevel.H });
 
-            loadParticipants();
-            loadPrizes();
+            const toggleBtn = document.getElementById('btn-toggle-status');
+            if (event.status === 'aberto') {
+                toggleBtn.textContent = 'Encerrar Inscrições';
+                toggleBtn.className = 'w-full bg-slate-900 hover:bg-slate-950 text-white py-3 rounded-xl font-bold transition';
+            } else if (event.status === 'encerrado') {
+                toggleBtn.textContent = 'Reabrir Inscrições';
+                toggleBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition';
+            } else {
+                toggleBtn.classList.add('hidden');
+                document.getElementById('btn-start-draw').disabled = true;
+                document.getElementById('btn-start-draw').textContent = 'Sorteio já finalizado';
+            }
+
+            await loadParticipants();
+            await loadPrizes();
         };
 
         const loadParticipants = async () => {
@@ -334,43 +274,28 @@
                 .order('numero_inscricao', { ascending: true });
 
             if (error) return;
-            participants = data;
+            participants = data || [];
             document.getElementById('part-count').textContent = participants.length;
 
             const list = document.getElementById('participants-list');
             list.innerHTML = '';
-            
-            if (participants.length === 0) {
+            if (!participants.length) {
                 document.getElementById('no-participants').classList.remove('hidden');
-            } else {
-                document.getElementById('no-participants').classList.add('hidden');
-                participants.forEach(p => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 transition-all group border-b border-slate-100 last:border-0';
-                    tr.innerHTML = `
-                        <td class="px-8 py-5">
-                            <span class="inline-flex items-center justify-center w-12 py-1 bg-blue-50 text-blue-600 rounded-lg text-[11px] font-black border border-blue-100">
-                                #${p.numero_inscricao.toString().padStart(3, '0')}
-                            </span>
-                        </td>
-                        <td class="px-8 py-5">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-[10px] font-bold text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                    ${p.nome.charAt(0).toUpperCase()}
-                                </div>
-                                <span class="font-bold text-slate-700 group-hover:text-blue-600 transition-colors">${p.nome}</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-5">
-                            <span class="text-sm font-medium text-slate-500 group-hover:text-slate-900 transition-colors">${p.whatsapp}</span>
-                        </td>
-                        <td class="px-8 py-5">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${new Date(p.criado_em).toLocaleDateString('pt-BR')} ${new Date(p.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
-                        </td>
-                    `;
-                    list.appendChild(tr);
-                });
+                return;
             }
+            document.getElementById('no-participants').classList.add('hidden');
+
+            participants.forEach((p) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-black text-blue-700">#${String(p.numero_inscricao).padStart(3, '0')}</td>
+                    <td class="px-4 py-3 font-semibold">${p.nome}</td>
+                    <td class="px-4 py-3">${p.whatsapp}</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">${new Date(p.criado_em).toLocaleString('pt-BR')}</td>
+                `;
+                list.appendChild(tr);
+            });
         };
 
         const loadPrizes = async () => {
@@ -379,252 +304,233 @@
                 .select('*')
                 .eq('evento_id', eventId)
                 .order('ordem', { ascending: true });
-            
-            if (!error) prizes = data;
+            if (!error) prizes = data || [];
         };
 
-        // Actions
-        document.getElementById('btn-toggle-status').addEventListener('click', async (e) => {
-            const btn = e.currentTarget;
-            const originalHTML = btn.innerHTML;
-            
-            try {
-                btn.disabled = true;
-                btn.textContent = "Processando...";
-                
-                const newStatus = currentEvent.status === 'aberto' ? 'encerrado' : 'aberto';
-                const { error } = await supabase.from('eventos').update({ status: newStatus }).eq('id', eventId);
-                
-                if (error) throw error;
-                await loadEventData();
-            } catch (err) {
-                console.error("Erro ao alterar status:", err);
-                alert("Erro ao alterar status: " + (err.message || "Tente novamente."));
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            }
-        });
+        const openDrawModal = () => {
+            makeParticles();
+            document.getElementById('draw-modal').classList.remove('hidden');
+            winners = [];
+            currentPrizeIndex = 0;
+            showPrizeStage();
+        };
 
-        document.getElementById('btn-copy-link').addEventListener('click', () => {
-            navigator.clipboard.writeText(document.getElementById('public-link-input').value);
-            alert("Link copiado!");
-        });
+        const closeDrawModal = () => {
+            document.getElementById('draw-modal').classList.add('hidden');
+        };
 
-        document.getElementById('btn-export-csv').addEventListener('click', () => {
-            if (participants.length === 0) return alert("Sem participantes para exportar.");
-            let csv = "Numero;Nome;WhatsApp;Data\n";
-            participants.forEach(p => {
-                csv += `${p.numero_inscricao};${p.nome};${p.whatsapp};${new Date(p.criado_em).toLocaleString()}\n`;
+        const setStage = (stageId) => {
+            ['stage-prize','stage-roulette','stage-winner','stage-final'].forEach((id) => {
+                document.getElementById(id).classList.add('hidden');
             });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `participantes-${currentEvent.slug}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
+            document.getElementById(stageId).classList.remove('hidden');
+        };
 
-        // DRAW LOGIC
-        const drawModal = document.getElementById('draw-modal');
-        const intro = document.getElementById('raffle-intro');
-        const active = document.getElementById('raffle-active');
-        const results = document.getElementById('raffle-results');
-        const belt = document.getElementById('roulette-belt');
-
-        document.getElementById('btn-start-draw').addEventListener('click', () => {
-            if (currentEvent.status === 'aberto') {
-                alert("Encerre as inscrições antes de realizar o sorteio.");
-                return;
-            }
-            if (participants.length === 0) {
-                alert("Não há participantes inscritos.");
-                return;
-            }
-            if (prizes.length === 0) {
-                alert("Não há prêmios cadastrados.");
-                return;
-            }
-
-            drawModal.classList.remove('hidden');
-            setTimeout(() => {
-                intro.classList.replace('opacity-0', 'opacity-100');
-                intro.classList.replace('translate-y-4', 'translate-y-0');
-            }, 100);
-            
-            document.getElementById('raffle-prize-total').textContent = prizes.length;
-        });
-
-        document.getElementById('btn-confirm-start').addEventListener('click', () => {
-            intro.classList.add('hidden');
-            active.classList.remove('hidden');
-            startRaffleCycle();
-        });
-
-        const startRaffleCycle = () => {
+        const showPrizeStage = () => {
             if (currentPrizeIndex >= prizes.length) {
-                showResults();
+                showFinalStage();
                 return;
             }
 
             const prize = prizes[currentPrizeIndex];
-            document.getElementById('raffle-prize-name').textContent = prize.descricao;
-            document.getElementById('raffle-prize-partner').textContent = prize.nome_parceiro;
-            document.getElementById('raffle-winner-reveal').classList.add('hidden');
-            document.getElementById('raffle-winner-reveal').classList.add('scale-50', 'opacity-0');
+            setStage('stage-prize');
+            document.getElementById('stage-prize-partner').textContent = prize.nome_parceiro;
+            document.getElementById('stage-prize-desc').textContent = prize.descricao;
+            const imageBox = document.getElementById('stage-prize-image');
+            imageBox.innerHTML = prize.imagem ? `<img src="${prize.imagem}" class="w-full h-full object-cover">` : '🎁';
+        };
 
-            // Find eligible participants (not already a winner)
-            const alreadyWonIds = winners.map(w => w.participantId);
-            const eligible = participants.filter(p => !alreadyWonIds.includes(p.id));
+        const spinNumberAndPickWinner = async () => {
+            const alreadyWonIds = winners.map((w) => w.participantId);
+            const eligible = participants.filter((p) => !alreadyWonIds.includes(p.id));
 
-            if (eligible.length === 0) {
-                alert("Não há participantes suficientes para todos os prêmios.");
-                showResults();
+            if (!eligible.length) {
+                showToast('Participantes insuficientes para continuar.', 'error');
+                showFinalStage();
                 return;
             }
 
-            // Fill roulette with random names from eligible
-            belt.innerHTML = '';
-            // Generate about 50 names for the roll effect
-            const pool = [];
-            for(let i=0; i<60; i++) {
-                pool.push(eligible[Math.floor(Math.random() * eligible.length)]);
+            const winner = eligible[Math.floor(Math.random() * eligible.length)];
+            setStage('stage-roulette');
+            const rouletteBox = document.getElementById('roulette-box');
+            const rouletteNumber = document.getElementById('roulette-number');
+            rouletteBox.classList.add('vibrate');
+
+            const start = Date.now();
+            const numbersPool = participants.map((p) => p.numero_inscricao).filter(Boolean);
+            const loop = () => {
+                const elapsed = Date.now() - start;
+                const randomNumber = numbersPool[Math.floor(Math.random() * numbersPool.length)] || 0;
+                rouletteNumber.textContent = `#${String(randomNumber).padStart(3, '0')}`;
+
+                if (elapsed >= 3000) {
+                    rouletteBox.classList.remove('vibrate');
+                    revealWinner(winner);
+                    return;
+                }
+
+                const delay = elapsed < 1800 ? 40 : Math.min(220, 40 + Math.floor((elapsed - 1800) / 6));
+                setTimeout(loop, delay);
+            };
+            loop();
+        };
+
+        const revealWinner = (winnerParticipant) => {
+            const prize = prizes[currentPrizeIndex];
+            setStage('stage-winner');
+
+            document.getElementById('winner-prize-image').innerHTML = prize.imagem ? `<img src="${prize.imagem}" class="w-full h-full object-cover">` : '🎁';
+            document.getElementById('winner-number').textContent = `#${String(winnerParticipant.numero_inscricao || 0).padStart(3, '0')}`;
+            document.getElementById('winner-name').textContent = winnerParticipant.nome;
+            document.getElementById('winner-phone').textContent = maskPhone(winnerParticipant.whatsapp);
+
+            winners.push({
+                prizeId: prize.id,
+                prizeName: prize.descricao,
+                prizeImage: prize.imagem,
+                partner: prize.nome_parceiro,
+                participantId: winnerParticipant.id,
+                participantName: winnerParticipant.nome,
+                participantPhone: winnerParticipant.whatsapp,
+                participantNumber: winnerParticipant.numero_inscricao
+            });
+
+            confetti({ particleCount: 260, spread: 100, origin: { y: 0.6 } });
+            confetti({ particleCount: 120, spread: 120, origin: { x: 0.2, y: 0.7 } });
+            confetti({ particleCount: 120, spread: 120, origin: { x: 0.8, y: 0.7 } });
+
+            const btnNext = document.getElementById('btn-next-prize');
+            btnNext.classList.add('hidden');
+            setTimeout(() => btnNext.classList.remove('hidden'), 2000);
+        };
+
+        const showFinalStage = () => {
+            setStage('stage-final');
+            const grid = document.getElementById('final-grid');
+            grid.innerHTML = '';
+
+            winners.forEach((winner) => {
+                const card = document.createElement('article');
+                card.className = 'border border-slate-200 rounded-2xl p-3 bg-slate-50';
+                card.innerHTML = `
+                    <div class="h-32 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center text-4xl mb-3">${winner.prizeImage ? `<img src="${winner.prizeImage}" class="w-full h-full object-cover">` : '🎁'}</div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">${winner.prizeName}</p>
+                    <p class="text-2xl font-black text-blue-700 mt-1">#${String(winner.participantNumber || 0).padStart(3, '0')}</p>
+                    <p class="text-sm font-semibold text-slate-800">${winner.participantName}</p>
+                `;
+                grid.appendChild(card);
+            });
+
+            const end = Date.now() + 5000;
+            const loop = () => {
+                confetti({ particleCount: 12, spread: 65, origin: { x: Math.random(), y: Math.random() * 0.3 } });
+                if (Date.now() < end) requestAnimationFrame(loop);
+            };
+            loop();
+        };
+
+        const saveResults = async () => {
+            if (!winners.length) {
+                showToast('Nenhum ganhador para salvar.', 'error');
+                return;
             }
 
-            // The real winner
-            const winner = eligible[Math.floor(Math.random() * eligible.length)];
-            pool[55] = winner; // Position where the animation will stop roughly
-
-            pool.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'text-white text-2xl font-bold py-4 opacity-40';
-                div.textContent = p.nome;
-                belt.appendChild(div);
-            });
-
-            // Start animation
-            belt.style.transition = 'none';
-            belt.style.transform = 'translateY(0)';
-            
-            setTimeout(() => {
-                belt.style.transition = 'transform 4s cubic-bezier(0.1, 0, 0.1, 1)';
-                const itemHeight = belt.firstChild.offsetHeight;
-                const offset = (55 * itemHeight) - (belt.parentElement.offsetHeight / 2) + (itemHeight / 2);
-                belt.style.transform = `translateY(-${offset}px)`;
-                
-                // Highlight winner in belt
-                setTimeout(() => {
-                    belt.children[55].classList.replace('opacity-40', 'opacity-100');
-                    belt.children[55].classList.add('text-blue-400', 'text-4xl', 'scale-110');
-                    
-                    // Reveal winner card
-                    confetti({
-                        particleCount: 150,
-                        spread: 70,
-                        origin: { y: 0.6 },
-                        colors: ['#2563EB', '#ffffff', '#60A5FA']
-                    });
-
-                    document.getElementById('winner-name').textContent = winner.nome;
-                    document.getElementById('winner-phone').textContent = winner.whatsapp;
-                    document.getElementById('raffle-winner-reveal').classList.remove('hidden');
-                    setTimeout(() => {
-                        document.getElementById('raffle-winner-reveal').classList.replace('scale-50', 'scale-100');
-                        document.getElementById('raffle-winner-reveal').classList.replace('opacity-0', 'opacity-100');
-                    }, 50);
-
-                    // Save winner object to sync later
-                    winners.push({
-                        prizeId: prize.id,
-                        prizeName: prize.descricao,
-                        partner: prize.nome_parceiro,
-                        participantId: winner.id,
-                        participantName: winner.nome,
-                        participantPhone: winner.whatsapp
-                    });
-                }, 4100);
-            }, 100);
-        };
-
-        document.getElementById('btn-next-raffle').addEventListener('click', () => {
-            currentPrizeIndex++;
-            startRaffleCycle();
-        });
-
-        const showResults = () => {
-            active.classList.add('hidden');
-            results.classList.remove('hidden');
-            const list = document.getElementById('results-list');
-            list.innerHTML = '';
-            winners.forEach(w => {
-                const div = document.createElement('div');
-                div.className = 'p-6 flex items-center justify-between group';
-                div.innerHTML = `
-                    <div class="space-y-1">
-                        <p class="text-white font-bold">${w.participantName}</p>
-                        <p class="text-slate-500 text-sm font-mono">${w.participantPhone}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-blue-400 font-bold text-sm uppercase">${w.prizeName}</p>
-                        <p class="text-slate-600 text-xs">${w.partner}</p>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        };
-
-        document.getElementById('btn-close-results').addEventListener('click', async () => {
-            const btn = document.getElementById('btn-close-results');
-            btn.disabled = true;
-            btn.textContent = 'Salvando resultados no servidor...';
-
+            const saveBtn = document.getElementById('btn-save-results');
+            setBtnLoading(saveBtn, true, 'Salvando...');
             try {
-                // Save each winner
                 for (const winner of winners) {
                     await supabase
                         .from('premios')
-                        .update({ 
-                            ganhador_id: winner.participantId,
-                            sorteado_em: new Date().toISOString()
-                        })
+                        .update({ ganhador_id: winner.participantId, sorteado_em: new Date().toISOString() })
                         .eq('id', winner.prizeId);
                 }
-
-                // Update event status
-                await supabase
-                    .from('eventos')
-                    .update({ status: 'sorteado' })
-                    .eq('id', eventId);
-
-                alert("Sorteio concluído com sucesso!");
-                window.location.reload();
+                await supabase.from('eventos').update({ status: 'sorteado' }).eq('id', eventId);
+                showToast('Resultados salvos com sucesso!', 'success');
+                await loadEventData();
             } catch (err) {
-                alert("Erro ao salvar: " + err.message);
-                btn.disabled = false;
-                btn.textContent = 'Encerrar e Salvar Resultados';
+                showToast(err.message || 'Erro ao salvar resultados.', 'error');
+            } finally {
+                setBtnLoading(saveBtn, false);
+            }
+        };
+
+        document.getElementById('btn-copy-link').addEventListener('click', async () => {
+            await navigator.clipboard.writeText(document.getElementById('public-link-input').value);
+            showToast('Link copiado.', 'success');
+        });
+
+        document.getElementById('btn-export-csv').addEventListener('click', () => {
+            if (!participants.length) {
+                showToast('Sem participantes para exportar.', 'error');
+                return;
+            }
+            let csv = 'Numero;Nome;WhatsApp;Data\n';
+            participants.forEach((p) => { csv += `${p.numero_inscricao};${p.nome};${p.whatsapp};${new Date(p.criado_em).toLocaleString('pt-BR')}\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `participantes-${currentEvent.slug}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('btn-toggle-status').addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            setBtnLoading(btn, true, 'Atualizando...');
+            try {
+                const newStatus = currentEvent.status === 'aberto' ? 'encerrado' : 'aberto';
+                const { error } = await supabase.from('eventos').update({ status: newStatus }).eq('id', eventId);
+                if (error) throw error;
+                await loadEventData();
+                showToast('Status atualizado.', 'success');
+            } catch (err) {
+                showToast(err.message || 'Erro ao alterar status.', 'error');
+            } finally {
+                setBtnLoading(btn, false);
             }
         });
 
-        // Logout
-        const btnLogout = document.getElementById('btn-logout');
-        if (btnLogout) {
-            btnLogout.addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    await supabase.auth.signOut();
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.replace('index.html');
-                } catch (err) {
-                    console.error("Erro ao sair:", err);
-                    window.location.href = 'index.html';
-                }
-            });
-        }
+        document.getElementById('btn-start-draw').addEventListener('click', () => {
+            if (currentEvent.status === 'aberto') {
+                showToast('Encerre as inscrições antes de sortear.', 'error');
+                return;
+            }
+            if (!participants.length) {
+                showToast('Não há participantes inscritos.', 'error');
+                return;
+            }
+            if (!prizes.length) {
+                showToast('Cadastre ao menos um prêmio.', 'error');
+                return;
+            }
+            openDrawModal();
+        });
 
-        checkAuth();
+        document.getElementById('btn-spin').addEventListener('click', spinNumberAndPickWinner);
+        document.getElementById('btn-next-prize').addEventListener('click', () => { currentPrizeIndex++; showPrizeStage(); });
+        document.getElementById('btn-close-draw').addEventListener('click', closeDrawModal);
+        document.getElementById('btn-finish').addEventListener('click', () => { closeDrawModal(); window.location.reload(); });
+        document.getElementById('btn-save-results').addEventListener('click', saveResults);
+        document.getElementById('btn-export-pdf').addEventListener('click', () => window.print());
+
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.replace('index.html');
+        });
+
+        const boot = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = '/index.html';
+                return;
+            }
+            await loadEventData();
+        };
+
+        boot();
     </script>
 </body>
 </html>

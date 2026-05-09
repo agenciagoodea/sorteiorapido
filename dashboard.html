@@ -12,6 +12,37 @@
         body { font-family: 'Inter', sans-serif; }
         .modal { transition: opacity 0.25s ease; }
         body.modal-active { overflow: hidden; }
+        .event-card {
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px rgba(15, 23, 42, 0.12);
+        }
+        .cover-upload-preview {
+            background: linear-gradient(145deg, #eef2ff, #e2e8f0);
+        }
+        .mini-spinner {
+            width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #ffffff;
+            animation: spin .7s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #toast-container .toast {
+            transform: translateY(10px);
+            opacity: 0;
+            transition: all .25s ease;
+        }
+        #toast-container .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen">
@@ -194,8 +225,8 @@
             <div class="p-10">
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Novo Evento</h3>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configuração do Sorteio</p>
+                        <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tight">Novo Evento</h3>
+                        <p id="modal-subtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configuração do Sorteio</p>
                     </div>
                     <button class="modal-close w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -224,6 +255,14 @@
                         <textarea id="event-desc" rows="2" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium" placeholder="Detalhes do sorteio..."></textarea>
                     </div>
 
+                    <div class="group space-y-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Imagem de Capa</label>
+                        <div id="event-cover-preview" class="cover-upload-preview w-full h-40 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center text-slate-400 text-xs font-bold">
+                            Sem imagem de capa
+                        </div>
+                        <input id="event-cover-input" type="file" accept="image/*" class="w-full text-xs bg-white border border-slate-200 rounded-xl p-3">
+                    </div>
+
                     <div class="group">
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Limite Máximo</label>
                         <input type="number" id="event-max" required value="100" min="1" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-bold">
@@ -237,19 +276,21 @@
                                 Adicionar
                             </button>
                         </div>
-                        <div id="prizes-container" class="space-y-3">
+                        <div id="prizes-container" class="space-y-3 max-h-72 overflow-y-auto pr-1">
                             <!-- Prizes added here -->
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-900/20 transition-all transform active:scale-95 flex items-center justify-center gap-3 mt-4">
+                    <button id="modal-submit-btn" type="submit" class="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-900/20 transition-all transform active:scale-95 flex items-center justify-center gap-3 mt-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        CRIAR EVENTO AGORA
+                        <span id="modal-submit-text">CRIAR EVENTO AGORA</span>
                     </button>
                 </form>
             </div>
         </div>
     </div>
+
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[60] space-y-2 w-[92vw] max-w-sm"></div>
 
     <!-- Scripts -->
     <script type="module">
@@ -292,6 +333,63 @@
         let currentUser = null;
         let allParticipants = [];
         let currentView = 'events';
+        let editingEventId = null;
+        let currentCoverBase64 = null;
+
+        const showToast = (message, type = 'info') => {
+            const container = document.getElementById('toast-container');
+            const colors = {
+                success: 'bg-emerald-600 text-white',
+                error: 'bg-red-600 text-white',
+                info: 'bg-slate-800 text-white'
+            };
+            const toast = document.createElement('div');
+            toast.className = `toast ${colors[type] || colors.info} px-4 py-3 rounded-xl shadow-xl text-sm font-semibold`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 250);
+            }, 2600);
+        };
+
+        const setButtonLoading = (btn, loading, label = 'Salvando...') => {
+            if (!btn) return;
+            if (loading) {
+                btn.dataset.originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<span class="mini-spinner"></span><span>${label}</span>`;
+                return;
+            }
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.originalHtml || btn.innerHTML;
+        };
+
+        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
+        const formatDate = (value) => {
+            if (!value) return '-';
+            const d = new Date(value);
+            return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('pt-BR');
+        };
+
+        const setCoverPreview = (base64 = null) => {
+            const preview = document.getElementById('event-cover-preview');
+            currentCoverBase64 = base64 || null;
+            if (!base64) {
+                preview.innerHTML = 'Sem imagem de capa';
+                preview.classList.remove('p-0');
+                return;
+            }
+            preview.classList.add('p-0');
+            preview.innerHTML = `<img src="${base64}" class="w-full h-full object-cover" alt="Capa do evento">`;
+        };
 
         // Check Auth
         const checkSession = async () => {
@@ -469,53 +567,62 @@
                     totalPrizes += (prizeCount || 0);
 
                     const card = document.createElement('div');
-                    card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col group transition-all hover:shadow-md';
+                    card.className = 'event-card bg-white rounded-3xl border border-slate-200 overflow-hidden';
                     
                     const statusConfig = {
-                        'aberto': { class: 'bg-green-100 text-green-700', label: 'Inscrições Abertas' },
-                        'encerrado': { class: 'bg-amber-100 text-amber-700', label: 'Encerrado (Sorteio Pendente)' },
-                        'sorteado': { class: 'bg-blue-100 text-blue-700', label: 'Sorteio Finalizado' }
+                        'aberto': { class: 'bg-emerald-100 text-emerald-700', label: '🟢 Aberto' },
+                        'encerrado': { class: 'bg-amber-100 text-amber-700', label: '🟡 Encerrado' },
+                        'sorteado': { class: 'bg-blue-100 text-blue-700', label: '🏆 Sorteado' }
                     };
 
                     const config = statusConfig[event.status] || { class: 'bg-slate-100 text-slate-600', label: event.status };
                     const publicURL = `${window.location.origin}/evento.html?slug=${event.slug}`;
                     const progress = Math.min(100, Math.round(((partCount || 0) / event.max_numeros) * 100));
+                    const progressFilled = Math.max(0, Math.min(10, Math.round(progress / 10)));
+                    const progressBarText = `${'▓'.repeat(progressFilled)}${'░'.repeat(10 - progressFilled)}`;
+                    const cover = event.imagem_capa || '';
+                    const coverHtml = cover
+                        ? `<img src="${cover}" alt="Capa do evento" class="w-full h-full object-cover">`
+                        : `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold cover-upload-preview">Sem capa</div>`;
 
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 ${config.class} text-xs font-bold uppercase rounded-full tracking-wider">${config.label}</span>
-                            <div class="flex gap-2">
-                                <button onclick="copyToClipboard('${publicURL}', this)" class="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Copiar Link">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
-                                </button>
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-bold mb-1 text-slate-800 group-hover:text-blue-700 transition-colors">${event.nome}</h3>
-                        <p class="text-slate-500 text-sm mb-6 line-clamp-2">${event.descricao || 'Nenhuma descrição fornecida.'}</p>
-                        
-                        <div class="space-y-4 mb-6 mt-auto">
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-slate-600 font-medium">Participantes</span>
-                                <span class="font-bold cursor-help" title="Vagas: ${event.max_numeros}">${partCount || 0} / ${event.max_numeros}</span>
-                            </div>
-                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div class="bg-blue-600 h-full transition-all duration-700" style="width: ${progress}%"></div>
-                            </div>
-                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-0">
+                            <div class="h-[180px] md:h-full md:min-h-[230px]">${coverHtml}</div>
+                            <div class="p-5 sm:p-6 flex flex-col gap-4">
+                                <div class="flex items-start justify-between gap-3">
+                                    <span class="px-3 py-1 ${config.class} text-[11px] font-extrabold rounded-full tracking-wide">${config.label}</span>
+                                    <span class="text-xs text-slate-500 font-semibold">criado em ${formatDate(event.criado_em)}</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-black text-slate-800 leading-tight">${event.nome}</h3>
+                                    <p class="text-slate-500 text-sm mt-1 line-clamp-2">${event.descricao || 'Nenhuma descrição fornecida.'}</p>
+                                </div>
 
-                        <div class="flex gap-2">
-                            ${event.status === 'encerrado' ? `
-                                <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="flex-[2] bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-100 transition-all transform active:scale-95">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Realizar Sorteio
-                                </button>
-                                <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 transition-all">Dados</button>
-                            ` : `
-                                <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 transition-all">Gerenciar Evento</button>
-                                <button onclick="copyToClipboard('${publicURL}', this)" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
-                                    <span>Copiar Link</span>
-                                </button>
-                            `}
+                                <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
+                                    <div class="flex items-center justify-between text-xs font-semibold text-slate-600 mb-2">
+                                        <span>Inscrições</span>
+                                        <span>${partCount || 0}/${event.max_numeros}</span>
+                                    </div>
+                                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
+                                        <div class="h-full bg-blue-600 transition-all duration-700" style="width: ${progress}%"></div>
+                                    </div>
+                                    <p class="text-xs font-mono text-slate-500">${progressBarText} ${partCount || 0}/${event.max_numeros}</p>
+                                </div>
+
+                                <div class="flex items-center justify-between text-xs text-slate-600">
+                                    <span class="font-semibold">Prêmios cadastrados</span>
+                                    <span class="font-black text-slate-900">${prizeCount || 0}</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-auto">
+                                    ${event.status === 'encerrado' ? `
+                                        <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="col-span-2 sm:col-span-1 bg-blue-900 hover:bg-blue-950 text-white py-2.5 rounded-xl font-bold text-sm transition-all">🎲 Sortear</button>
+                                    ` : ''}
+                                    <button onclick="openEditEventModal('${event.id}')" class="col-span-1 bg-slate-200 hover:bg-slate-300 text-slate-800 py-2.5 rounded-xl font-bold text-sm transition-all">✏️ Editar</button>
+                                    <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all">📊 Dados</button>
+                                    <button onclick="copyToClipboard('${publicURL}', this)" class="col-span-2 sm:col-span-1 bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all">🔗 Copiar Link</button>
+                                </div>
+                            </div>
                         </div>
                     `;
                     grid.appendChild(card);
@@ -597,7 +704,7 @@
                             </div>
                             <div>
                                 <p class="text-sm font-bold text-slate-800">${p.nome}</p>
-                                <p class="text-[10px] text-slate-400 font-medium">${p.telefone}</p>
+                                <p class="text-[10px] text-slate-400 font-medium">${p.whatsapp || '-'}</p>
                             </div>
                         </div>
                     </td>
@@ -606,14 +713,14 @@
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex flex-wrap justify-center gap-1">
-                            ${p.numeros.map(num => `<span class="inline-block w-6 h-6 leading-6 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">${num}</span>`).join('')}
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded bg-blue-100 text-blue-700 text-xs font-black">#${String(p.numero_inscricao || 0).padStart(3, '0')}</span>
                         </div>
                     </td>
                     <td class="px-6 py-4 text-xs text-slate-500 font-medium">
                         ${date}
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="window.open('https://wa.me/55${p.telefone.replace(/\D/g, '')}', '_blank')" class="p-2 text-slate-300 hover:text-green-500 transition-all transform hover:scale-110" title="Conversar no WhatsApp">
+                        <button onclick="window.open('https://wa.me/55${(p.whatsapp || '').replace(/\\D/g, '')}', '_blank')" class="p-2 text-slate-300 hover:text-green-500 transition-all transform hover:scale-110" title="Conversar no WhatsApp">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.208 1.888-4.208 4.208 0 .744.192 1.44.528 2.053l-.561 2.053 2.103-.551a4.17 4.17 0 0 0 2.139.589c2.32 0 4.208-1.888 4.208-4.208s-1.888-4.208-4.208-4.208zm2.492 6.003c-.102.284-.592.541-.812.576-.22.035-.436.059-.728-.035-.292-.094-1.246-.46-2.373-1.465-.877-.784-1.469-1.753-1.641-2.046-.172-.293-.018-.452.129-.597.132-.131.293-.341.44-.511.146-.171.195-.284.293-.474.098-.189.049-.356-.024-.499-.073-.142-.656-1.581-.899-2.164-.236-.566-.475-.49-.656-.499-.17-.009-.366-.01-.561-.01-.195 0-.512.073-.78.366-.268.293-1.024 1-1.024 2.439 0 1.439 1.049 2.829 1.195 3.024.146.195 2.064 3.151 5.001 4.417.699.301 1.244.481 1.669.616.702.223 1.341.191 1.846.116.564-.084 1.732-.707 1.976-1.39.244-.683.244-1.268.171-1.39-.073-.122-.268-.195-.561-.341z"/></svg>
                         </button>
                     </td>
@@ -627,7 +734,7 @@
             const term = e.target.value.toLowerCase();
             const filtered = allParticipants.filter(p => 
                 p.nome.toLowerCase().includes(term) || 
-                p.telefone.includes(term) ||
+                (p.whatsapp || '').includes(term) ||
                 p.evento_nome.toLowerCase().includes(term)
             );
             renderParticipants(filtered);
@@ -639,14 +746,117 @@
             document.getElementById('stat-pending-prizes').textContent = `${totalPrizes} Cadastrados`;
         };
 
+        // Prizes Logic
+        const addPrizeRow = (partner = '', description = '', imageBase64 = '') => {
+            const container = document.getElementById('prizes-container');
+            const div = document.createElement('div');
+            div.className = 'prize-row border border-slate-200 rounded-2xl p-3 bg-slate-50/70';
+            div.innerHTML = `
+                <div class="flex gap-3 items-start">
+                    <div class="prize-image-preview w-20 h-20 shrink-0 rounded-xl border border-dashed border-slate-300 bg-white flex items-center justify-center text-[10px] text-slate-400 font-bold overflow-hidden">Sem foto</div>
+                    <div class="flex-1 space-y-2">
+                        <input type="text" placeholder="Nome do Parceiro" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-partner">
+                        <input type="text" placeholder="Descrição do Prêmio" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-desc">
+                        <input type="file" accept="image/*" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 prize-image-input">
+                    </div>
+                    <button type="button" class="text-red-400 hover:text-red-600 mt-1 transition-colors remove-prize" title="Remover prêmio">
+                        🗑️
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+            div.querySelector('.prize-partner').value = partner;
+            div.querySelector('.prize-desc').value = description;
+            div.dataset.image = imageBase64 || '';
+
+            const previewEl = div.querySelector('.prize-image-preview');
+            const renderPrizePreview = (image) => {
+                if (!image) {
+                    previewEl.innerHTML = 'Sem foto';
+                    return;
+                }
+                previewEl.innerHTML = `<img src="${image}" alt="Foto do prêmio" class="w-full h-full object-cover">`;
+            };
+            renderPrizePreview(imageBase64);
+
+            div.querySelector('.prize-image-input').addEventListener('change', async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('Imagem do prêmio deve ter no máximo 2MB.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+                const base64 = await fileToBase64(file);
+                div.dataset.image = base64;
+                renderPrizePreview(base64);
+            });
+
+            div.querySelector('.remove-prize').addEventListener('click', () => {
+                if (container.children.length > 1) div.remove();
+            });
+        };
+
+        const setModalMode = (mode) => {
+            const title = document.getElementById('modal-title');
+            const subtitle = document.getElementById('modal-subtitle');
+            const submitText = document.getElementById('modal-submit-text');
+
+            if (mode === 'edit') {
+                title.textContent = 'Editar Evento';
+                subtitle.textContent = 'Atualize as informações do sorteio';
+                submitText.textContent = 'SALVAR ALTERAÇÕES';
+                return;
+            }
+
+            title.textContent = 'Novo Evento';
+            subtitle.textContent = 'Configuração do Sorteio';
+            submitText.textContent = 'CRIAR EVENTO AGORA';
+        };
+
+        const resetEventForm = () => {
+            editingEventId = null;
+            setModalMode('create');
+            document.getElementById('create-event-form').reset();
+            document.getElementById('prizes-container').innerHTML = '';
+            document.getElementById('modal-error').classList.add('hidden');
+            setCoverPreview(null);
+            addPrizeRow();
+        };
+
         // Modal toggle
-        const openModal = () => {
+        const openModal = ({ mode = 'create', eventData = null, prizes = [] } = {}) => {
             document.body.classList.add('modal-active');
             const modal = document.getElementById('create-modal');
             const container = modal.querySelector('.modal-container');
             const errorBox = document.getElementById('modal-error');
-            
+
             errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+            document.getElementById('create-event-form').reset();
+            document.getElementById('prizes-container').innerHTML = '';
+
+            if (mode === 'edit' && eventData) {
+                editingEventId = eventData.id;
+                setModalMode('edit');
+                document.getElementById('event-name').value = eventData.nome || '';
+                document.getElementById('event-slug').value = eventData.slug || '';
+                document.getElementById('event-desc').value = eventData.descricao || '';
+                document.getElementById('event-max').value = eventData.max_numeros || 100;
+                setCoverPreview(eventData.imagem_capa || null);
+
+                if (prizes.length > 0) {
+                    prizes.forEach(prize => addPrizeRow(prize.nome_parceiro || '', prize.descricao || '', prize.imagem || ''));
+                } else {
+                    addPrizeRow();
+                }
+            } else {
+                editingEventId = null;
+                setModalMode('create');
+                setCoverPreview(null);
+                addPrizeRow();
+            }
+
             modal.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                 container.classList.remove('opacity-0', 'scale-95');
@@ -658,45 +868,62 @@
             document.body.classList.remove('modal-active');
             const modal = document.getElementById('create-modal');
             const container = modal.querySelector('.modal-container');
-            
+
             container.classList.remove('opacity-100', 'scale-100');
             container.classList.add('opacity-0', 'scale-95');
-            
+
             setTimeout(() => {
                 modal.classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('create-event-form').reset();
-                document.getElementById('prizes-container').innerHTML = '';
-                document.getElementById('modal-error').classList.add('hidden');
-                addPrizeRow(); // Add at least one
+                resetEventForm();
             }, 300);
         };
 
-        document.getElementById('open-create-modal').addEventListener('click', openModal);
-        document.querySelectorAll('.modal-overlay, .modal-close').forEach(el => el.addEventListener('click', closeModal));
+        window.openEditEventModal = async (eventId) => {
+            try {
+                const { data: eventData, error: eventError } = await supabase
+                    .from('eventos')
+                    .select('id, nome, slug, descricao, imagem_capa, max_numeros, status, coordenador_id')
+                    .eq('id', eventId)
+                    .eq('coordenador_id', currentUser.id)
+                    .single();
 
-        // Prizes Logic
-        const addPrizeRow = () => {
-            const container = document.getElementById('prizes-container');
-            const div = document.createElement('div');
-            div.className = 'flex gap-2 items-start prize-row group';
-            div.innerHTML = `
-                <div class="flex-1 space-y-2">
-                    <input type="text" placeholder="Nome do Parceiro (ex: Loja Fictícia)" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-partner">
-                    <input type="text" placeholder="O que é o prêmio? (ex: Vale compras R$ 100)" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-desc">
-                </div>
-                <button type="button" class="text-slate-300 hover:text-red-500 mt-2 transform transition-transform group-hover:scale-110 remove-prize">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            `;
-            container.appendChild(div);
-            div.querySelector('.remove-prize').addEventListener('click', () => {
-                if (container.children.length > 1) div.remove();
-            });
+                if (eventError || !eventData) throw new Error('Não foi possível carregar esse evento.');
+                if (eventData.status === 'sorteado') {
+                    showToast('Eventos já sorteados não podem ser editados.', 'info');
+                    return;
+                }
+
+                const { data: prizesData, error: prizesError } = await supabase
+                    .from('premios')
+                    .select('nome_parceiro, descricao, imagem, ordem')
+                    .eq('evento_id', eventId)
+                    .order('ordem', { ascending: true });
+
+                if (prizesError) throw prizesError;
+                openModal({ mode: 'edit', eventData, prizes: prizesData || [] });
+            } catch (err) {
+                console.error('Erro ao abrir edição do evento:', err);
+                showToast(err.message || 'Erro ao carregar dados do evento.', 'error');
+            }
         };
 
+        document.getElementById('open-create-modal').addEventListener('click', () => openModal({ mode: 'create' }));
+        document.querySelectorAll('.modal-overlay, .modal-close').forEach(el => el.addEventListener('click', closeModal));
         document.getElementById('add-prize').addEventListener('click', addPrizeRow);
+        document.getElementById('event-cover-input').addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) {
+                setCoverPreview(null);
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Imagem de capa deve ter no máximo 2MB.', 'error');
+                e.target.value = '';
+                return;
+            }
+            const base64 = await fileToBase64(file);
+            setCoverPreview(base64);
+        });
 
         // Slugify helper
         const slugify = text => text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -705,18 +932,16 @@
             document.getElementById('event-slug').value = slugify(e.target.value);
         });
 
-        // Create Event Form
+        // Create/Edit Event Form
         document.getElementById('create-event-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             const errorBox = document.getElementById('modal-error');
-            const originalText = btn.innerHTML;
             
             try {
                 console.log("Starting event submission...");
                 errorBox.classList.add('hidden');
-                btn.disabled = true;
-                btn.textContent = 'Salvando...';
+                setButtonLoading(btn, true, 'Salvando...');
 
                 const name = document.getElementById('event-name').value;
                 const slugInput = document.getElementById('event-slug').value;
@@ -726,73 +951,119 @@
                 if (!slugInput) throw new Error("O slug é obrigatório.");
                 if (!currentUser) throw new Error("Usuário não autenticado. Tente fazer login novamente.");
 
-                console.log("Inserting event into DB...");
-                // Create Event
-                const insertResponse = await supabase
-                    .from('eventos')
-                    .insert([{ 
-                        nome: name, 
-                        slug: slugInput, 
-                        descricao: desc, 
-                        max_numeros: max,
-                        coordenador_id: currentUser.id
-                    }])
-                    .select()
-                    .single();
-
-                const eventError = insertResponse.error;
-                const event = insertResponse.data;
-
-                if (eventError) {
-                    console.error("Detailed DB Insert Error:", eventError);
-                    if (eventError.message.includes('unique')) {
-                        throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
-                    }
-                    if (eventError.code === '42501') {
-                        throw new Error("Permissão negada (RLS). Verifique se as Tabelas e as Políticas de Segurança (Policies) foram criadas corretamente no painel do Supabase.");
-                    }
-                    if (eventError.code === '23503') {
-                        throw new Error("Erro de integridade (Foreign Key). Certifique-se de que seu perfil de coordenador foi criado corretamente.");
-                    }
-                    throw new Error(`Erro do Supabase (${eventError.code}): ${eventError.message}`);
-                }
-                
-                if (!event) throw new Error("O servidor não retornou os dados do evento criado.");
-
-                console.log("Event created, inserting prizes...", event.id);
-                // Create Prizes
                 const prizeRows = document.querySelectorAll('.prize-row');
-                const prizes = Array.from(prizeRows)
+                const prizePayload = Array.from(prizeRows)
                     .map((row, index) => {
                         const partner = row.querySelector('.prize-partner').value;
                         const pDesc = row.querySelector('.prize-desc').value;
                         if (!partner && !pDesc) return null; // Skip empty rows
                         return {
-                            evento_id: event.id,
                             nome_parceiro: partner || 'Parceiro',
                             descricao: pDesc || 'Prêmio Surpresa',
+                            imagem: row.dataset.image || null,
                             ordem: index + 1
                         };
                     })
                     .filter(p => p !== null);
 
-                if (prizes.length > 0) {
-                    const { error: prizesError } = await supabase.from('premios').insert(prizes);
+                let savedEventId = editingEventId;
+
+                if (editingEventId) {
+                    console.log("Updating event in DB...", editingEventId);
+                    const updateResponse = await supabase
+                        .from('eventos')
+                        .update({
+                            nome: name,
+                            slug: slugInput,
+                            descricao: desc,
+                            imagem_capa: currentCoverBase64,
+                            max_numeros: max
+                        })
+                        .eq('id', editingEventId)
+                        .eq('coordenador_id', currentUser.id)
+                        .select('id')
+                        .single();
+
+                    const eventError = updateResponse.error;
+                    const updatedEvent = updateResponse.data;
+
+                    if (eventError) {
+                        console.error("Detailed DB Update Error:", eventError);
+                        if (eventError.message.includes('unique')) {
+                            throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
+                        }
+                        throw new Error(`Erro do Supabase (${eventError.code}): ${eventError.message}`);
+                    }
+
+                    if (!updatedEvent) throw new Error("O servidor não retornou os dados do evento atualizado.");
+                    savedEventId = updatedEvent.id;
+
+                    // Replace current prize configuration for this event.
+                    const { error: deletePrizesError } = await supabase
+                        .from('premios')
+                        .delete()
+                        .eq('evento_id', savedEventId);
+                    if (deletePrizesError) throw deletePrizesError;
+                } else {
+                    console.log("Inserting event into DB...");
+                    const insertResponse = await supabase
+                        .from('eventos')
+                        .insert([{ 
+                            nome: name, 
+                            slug: slugInput, 
+                            descricao: desc, 
+                            imagem_capa: currentCoverBase64,
+                            max_numeros: max,
+                            coordenador_id: currentUser.id
+                        }])
+                        .select('id')
+                        .single();
+
+                    const eventError = insertResponse.error;
+                    const createdEvent = insertResponse.data;
+
+                    if (eventError) {
+                        console.error("Detailed DB Insert Error:", eventError);
+                        if (eventError.message.includes('unique')) {
+                            throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
+                        }
+                        if (eventError.code === '42501') {
+                            throw new Error("Permissão negada (RLS). Verifique se as Tabelas e as Políticas de Segurança (Policies) foram criadas corretamente no painel do Supabase.");
+                        }
+                        if (eventError.code === '23503') {
+                            throw new Error("Erro de integridade (Foreign Key). Certifique-se de que seu perfil de coordenador foi criado corretamente.");
+                        }
+                        throw new Error(`Erro do Supabase (${eventError.code}): ${eventError.message}`);
+                    }
+                    
+                    if (!createdEvent) throw new Error("O servidor não retornou os dados do evento criado.");
+                    savedEventId = createdEvent.id;
+                }
+
+                if (prizePayload.length > 0) {
+                    const prizesToInsert = prizePayload.map(prize => ({
+                        ...prize,
+                        evento_id: savedEventId
+                    }));
+                    const { error: prizesError } = await supabase.from('premios').insert(prizesToInsert);
                     if (prizesError) {
                         console.error("Prizes Insert Error:", prizesError);
-                        console.warn("Evento criado, mas erro nos prêmios:", prizesError.message);
+                        console.warn("Evento salvo, mas erro nos prêmios:", prizesError.message);
                     }
                 }
 
                 console.log("Submission complete success!");
                 closeModal();
                 await loadEvents();
+                await loadParticipants();
+                showToast(editingEventId ? 'Evento atualizado com sucesso!' : 'Evento criado com sucesso!', 'success');
             } catch (err) {
                 console.error("Erro fatal na submissão:", err);
                 errorBox.textContent = err.message || "Erro inesperado ao salvar. Verifique o console ou tente novamente.";
                 errorBox.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
+                showToast(err.message || 'Erro ao salvar evento.', 'error');
+            } finally {
+                setButtonLoading(btn, false);
             }
         });
 
@@ -860,22 +1131,26 @@
         });
 
         // Copy Link
-        window.copyToClipboard = (text, btn) => {
-            navigator.clipboard.writeText(text);
-            const span = btn.querySelector('span');
-            const oldText = span.textContent;
-            span.textContent = 'Copiado!';
-            btn.classList.add('bg-green-100', 'text-green-700');
-            setTimeout(() => {
-                span.textContent = oldText;
-                btn.classList.remove('bg-green-100', 'text-green-700');
-            }, 2000);
+        window.copyToClipboard = async (text, btn) => {
+            try {
+                await navigator.clipboard.writeText(text);
+                const oldText = btn.textContent;
+                btn.textContent = '✅ Copiado';
+                setTimeout(() => {
+                    btn.textContent = oldText;
+                }, 1200);
+                showToast('Link copiado para a área de transferência.', 'success');
+            } catch (err) {
+                showToast('Não foi possível copiar o link.', 'error');
+            }
         };
 
         // Init
+        setCoverPreview(null);
         addPrizeRow();
         checkSession();
 
     </script>
 </body>
 </html>
+

@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS eventos (
   coordenador_id uuid REFERENCES coordenadores(id) NOT NULL,
   nome text NOT NULL,
   descricao text,
+  imagem_capa text,
   slug text UNIQUE NOT NULL, -- usado na URL pública: /evento.html?slug=dia-das-maes-2025
   max_numeros int NOT NULL DEFAULT 100, -- limite de inscrições
   status text DEFAULT 'aberto', -- aberto | encerrado | sorteado
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS premios (
   evento_id uuid REFERENCES eventos(id) ON DELETE CASCADE,
   nome_parceiro text NOT NULL,
   descricao text NOT NULL,
+  imagem text,
   ordem int NOT NULL,
   ganhador_id uuid REFERENCES participantes(id) ON DELETE SET NULL,
   sorteado_em timestamp
@@ -66,3 +68,9 @@ CREATE POLICY "part_insert_public" ON participantes FOR INSERT WITH CHECK (true)
 CREATE POLICY "part_owner_read" ON participantes FOR SELECT USING (
   evento_id IN (SELECT id FROM eventos WHERE coordenador_id = auth.uid())
 );
+
+
+-- Safe migrations for existing databases
+ALTER TABLE eventos ADD COLUMN IF NOT EXISTS imagem_capa text;
+ALTER TABLE premios ADD COLUMN IF NOT EXISTS imagem text;
+
