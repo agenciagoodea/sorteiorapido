@@ -255,8 +255,21 @@
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        // Robust environment variable access
+        const getEnv = (key) => {
+            if (typeof window !== 'undefined' && window[key]) return window[key];
+            if (typeof process !== 'undefined' && process.env && process.env[key]) return process.env[key];
+            if (typeof import.meta.env !== 'undefined' && import.meta.env[key]) return import.meta.env[key];
+            return null;
+        };
+
+        const SUPABASE_URL = getEnv('VITE_SUPABASE_URL');
+        const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY');
+
+        console.log("Supabase Config Detected:", { 
+            url: SUPABASE_URL ? "Exists" : "Missing", 
+            key: SUPABASE_ANON_KEY ? "Exists" : "Missing" 
+        });
 
         const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
 
@@ -388,16 +401,18 @@
                     if (error.code !== 'PGRST116') throw error;
                 }
 
-                statusDiv.classList.replace('bg-slate-50', 'bg-emerald-50');
-                statusDiv.classList.replace('text-slate-400', 'text-emerald-600');
-                dot.classList.replace('bg-slate-300', 'bg-emerald-500');
+                statusDiv.classList.remove('bg-white', 'border-slate-200', 'text-slate-400', 'bg-red-50', 'text-red-600');
+                statusDiv.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-100');
+                dot.classList.remove('bg-slate-300', 'bg-red-500');
+                dot.classList.add('bg-emerald-500');
                 text.textContent = 'Banco Conectado';
                 alert.classList.add('hidden');
             } catch (err) {
                 console.error("DB Connection Error:", err);
-                statusDiv.classList.replace('bg-slate-50', 'bg-red-50');
-                statusDiv.classList.replace('text-slate-400', 'text-red-600');
-                dot.classList.replace('bg-slate-300', 'bg-red-500');
+                statusDiv.classList.remove('bg-white', 'border-slate-200', 'text-slate-400', 'bg-emerald-50', 'text-emerald-600');
+                statusDiv.classList.add('bg-red-50', 'text-red-600', 'border-red-100');
+                dot.classList.remove('bg-slate-300', 'bg-emerald-500');
+                dot.classList.add('bg-red-500');
                 text.textContent = 'Erro de Conexão';
                 alert.classList.remove('hidden');
                 alert.innerHTML = `
