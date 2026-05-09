@@ -78,8 +78,8 @@
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
         const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
 
@@ -98,10 +98,9 @@
                                 <li class="flex gap-2"><span>1.</span><span>Abra o menu <b>Settings</b> (ícone da engrenagem à esquerda).</span></li>
                                 <li class="flex gap-2"><span>2.</span><span>Adicione <b>VITE_SUPABASE_URL</b> com sua URL do projeto.</span></li>
                                 <li class="flex gap-2"><span>3.</span><span>Adicione <b>VITE_SUPABASE_ANON_KEY</b> com sua chave anônima.</span></li>
-                                <li class="flex gap-2"><span>4.</span><span>Se estiver no Vercel, adicione estas variáveis no painel da Vercel.</span></li>
+                                <li class="flex gap-2"><span>4.</span><span>Aplique as mudanças e o app irá reiniciar.</span></li>
                             </ol>
                         </div>
-                        <p class="text-[9px] text-slate-300 font-bold uppercase tracking-widest leading-relaxed">Certifique-se de preencher as chaves corretamente para ativar a conexão com o banco de dados.</p>
                     </div>
                 </div>
             `;
@@ -116,20 +115,20 @@
             const text = document.querySelector('.conn-text');
             const errorBox = document.getElementById('error-message');
             try {
-                const { error } = await supabase.from('coordenadores').select('id').limit(1);
-                if (error) throw error;
+                const { error } = await supabase.from('eventos').select('id').limit(1);
+                if (error && error.code !== 'PGRST116') throw error;
+                
                 dot.classList.replace('bg-slate-200', 'bg-emerald-400');
                 text.textContent = 'Servidor Online';
                 text.classList.replace('text-slate-300', 'text-emerald-500');
             } catch (err) {
                 console.error("Connection Check Failed:", err);
                 dot.classList.replace('bg-slate-200', 'bg-red-400');
-                text.textContent = 'Erro de Conexão';
+                text.textContent = 'Indisponível';
                 text.classList.replace('text-slate-300', 'text-red-500');
                 
-                // Show a helpful hint if keys are definitely missing or wrong
                 if (err.message?.includes('supabaseUrl is required') || err.message?.includes('Invalid Key')) {
-                    errorBox.textContent = "Configuração do Supabase pendente. Verifique as chaves no menu Settings.";
+                    errorBox.textContent = "Erro nas chaves do Supabase. Verifique o menu Settings.";
                     errorBox.classList.remove('hidden');
                 }
             }

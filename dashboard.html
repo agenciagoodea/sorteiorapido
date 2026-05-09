@@ -17,36 +17,41 @@
 <body class="bg-slate-50 text-slate-900 min-h-screen">
     <div class="flex min-h-screen overflow-hidden bg-slate-50 font-sans text-slate-900">
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex flex-col">
-            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-lg text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out flex flex-col">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-3 font-app">
+                    <div class="bg-blue-600 p-2 rounded-lg text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-blue-900">SorteioFácil</span>
                 </div>
-                <span class="font-bold text-xl tracking-tight text-blue-900">SorteioFácil</span>
+                <button id="close-sidebar" class="lg:hidden text-slate-400 p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             <nav class="flex-1 p-4 space-y-1">
-                <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl font-medium">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <a href="#" id="nav-events" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl font-medium group transition-all">
+                    <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     Meus Eventos
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <a href="#" id="nav-participants" class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 rounded-xl transition-colors group">
+                    <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     Participantes
                 </a>
             </nav>
-            <div class="p-4 border-t border-slate-100">
-                <div id="connection-status" class="mb-4 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 bg-slate-50 text-slate-400">
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                <div id="connection-status" class="mb-4 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 bg-white border border-slate-200 text-slate-400 cursor-help" title="Clique para detalhes da conexão">
                     <div class="w-2 h-2 rounded-full bg-slate-300 status-dot"></div>
                     <span class="status-text">Testando Conexão...</span>
                 </div>
-                <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold uppercase" id="avatar-circle">?</div>
+                <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm mb-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold uppercase shrink-0" id="avatar-circle">?</div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold truncate" id="user-name-display">Coordenador</p>
-                        <p class="text-xs text-slate-500">Logado no Painel</p>
+                        <p class="text-sm font-bold truncate text-slate-800" id="user-name-display">Coordenador</p>
+                        <p class="text-xs text-slate-400">Logado no Painel</p>
                     </div>
                 </div>
-                <button id="btn-logout" class="w-full mt-4 flex items-center justify-center gap-2 py-2 text-sm text-slate-500 hover:text-red-600 transition-colors">
+                <button id="btn-logout" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-100 rounded-xl transition-all font-bold text-sm shadow-sm active:scale-95">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Sair da Conta
                 </button>
@@ -56,15 +61,25 @@
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-y-auto">
             <!-- Header -->
-            <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
+            <header class="h-24 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
                 <div>
-                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Seus Sorteios</h1>
-                    <p class="text-sm text-slate-500 font-medium">Gerencie suas campanhas e participantes</p>
+                    <h1 id="view-title" class="text-2xl font-black text-slate-800 tracking-tight">Meus Eventos</h1>
+                    <p id="view-subtitle" class="text-sm text-slate-500 font-medium">Gerencie suas campanhas e participantes</p>
                 </div>
-                <button id="open-create-modal" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-100 transition-all transform active:scale-95">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    Criar Novo Sorteio
-                </button>
+                <div id="header-actions" class="flex items-center gap-3">
+                    <button id="btn-logout-header" class="hidden sm:flex text-slate-400 hover:text-red-500 transition-colors p-2" title="Sair da Conta">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
+                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                    <button id="open-sidebar" class="lg:hidden p-2.5 text-slate-500 bg-slate-50 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                    <button id="open-create-modal" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-100 transition-all transform active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <span class="hidden sm:inline">Criar Sorteio</span>
+                        <span class="sm:hidden">Criar</span>
+                    </button>
+                </div>
             </header>
 
             <div class="p-8">
@@ -73,23 +88,62 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     <p class="text-sm font-bold">Erro de conectividade detectado. Verifique as credenciais do Supabase.</p>
                 </div>
-                <!-- Events Grid -->
-                <div id="events-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <!-- Loading States -->
-                    <div class="animate-pulse bg-white p-6 rounded-2xl border border-slate-200 h-64"></div>
-                    <div class="animate-pulse bg-white p-6 rounded-2xl border border-slate-200 h-64"></div>
+
+                <!-- Events View -->
+                <div id="view-events-content">
+                    <div id="events-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <!-- Loading States -->
+                        <div class="animate-pulse bg-white p-6 rounded-2xl border border-slate-200 h-64"></div>
+                        <div class="animate-pulse bg-white p-6 rounded-2xl border border-slate-200 h-64"></div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                        <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-700">Nenhum evento criado</h3>
+                        <p class="text-slate-500 max-w-sm mt-2 mb-6">Comece agora criando seu primeiro sorteio para engajar sua audiência.</p>
+                        <button onclick="document.getElementById('open-create-modal').click()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100">Criar agora &rarr;</button>
+                    </div>
                 </div>
 
-                <!-- Empty State -->
-                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
-                    <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
+                <!-- Participants View -->
+                <div id="view-participants-content" class="hidden">
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-50/50">
+                            <div class="relative w-full md:w-96">
+                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </span>
+                                <input type="text" id="search-participants" placeholder="Buscar por nome ou celular..." class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm">
+                            </div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
+                                Total: <span id="total-participants-count" class="text-blue-600">0</span> Inscritos
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/50">
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Participante</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Evento</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Números</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Inscrição</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="participants-table-body" class="divide-y divide-slate-50">
+                                    <!-- Table contents -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="participants-empty" class="hidden p-20 text-center">
+                            <p class="text-slate-400 font-medium">Nenhum participante encontrado.</p>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-700">Nenhum evento criado</h3>
-                    <p class="text-slate-500 max-w-sm mt-2 mb-6">Comece agora criando seu primeiro sorteio para engajar sua audiência.</p>
-                    <button onclick="document.getElementById('open-create-modal').click()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100">Criar agora &rarr;</button>
                 </div>
             </div>
 
@@ -201,8 +255,8 @@
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
         const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
 
@@ -223,6 +277,8 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
+        let allParticipants = [];
+        let currentView = 'events';
 
         // Check Auth
         const checkSession = async () => {
@@ -234,27 +290,39 @@
             currentUser = session.user;
             
             // Test DB Connectivity
-            testConnectivity();
+            await testConnectivity();
 
             // Get coord profile
-            let { data: profile } = await supabase
+            console.log("Fetching user profile...");
+            let { data: profile, error: profileError } = await supabase
                 .from('coordenadores')
                 .select('nome')
                 .eq('id', currentUser.id)
-                .single();
+                .maybeSingle();
+
+            if (profileError) {
+                console.error("Error fetching profile:", profileError);
+            }
             
             if (!profile && currentUser) {
                 console.log("Profile not found, creating lazy profile...");
-                const { data: newProfile, error } = await supabase
-                    .from('coordenadores')
-                    .insert([{ 
-                        id: currentUser.id, 
-                        nome: currentUser.user_metadata.full_name || currentUser.email.split('@')[0],
-                        email: currentUser.email 
-                    }])
-                    .select()
-                    .single();
-                if (!error) profile = newProfile;
+                try {
+                    const { data: newProfile, error: createError } = await supabase
+                        .from('coordenadores')
+                        .upsert([{ 
+                            id: currentUser.id, 
+                            nome: currentUser.user_metadata.full_name || currentUser.email.split('@')[0],
+                            email: currentUser.email 
+                        }])
+                        .select()
+                        .single();
+                    
+                    if (createError) throw createError;
+                    profile = newProfile;
+                    console.log("Profile created successfully.");
+                } catch (err) {
+                    console.error("Failed to create profile:", err);
+                }
             }
             
             if (profile) {
@@ -263,8 +331,47 @@
                 document.getElementById('avatar-circle').textContent = initials;
             }
             
-            loadEvents();
+            // Initial View
+            switchView('events');
         };
+
+        const switchView = async (view) => {
+            currentView = view;
+            const eventsContent = document.getElementById('view-events-content');
+            const participantsContent = document.getElementById('view-participants-content');
+            const title = document.getElementById('view-title');
+            const subtitle = document.getElementById('view-subtitle');
+            const navEvents = document.getElementById('nav-events');
+            const navParts = document.getElementById('nav-participants');
+            const headerActions = document.getElementById('header-actions');
+
+            if (view === 'events') {
+                eventsContent.classList.remove('hidden');
+                participantsContent.classList.add('hidden');
+                title.textContent = 'Meus Eventos';
+                subtitle.textContent = 'Gerencie suas campanhas e participantes';
+                navEvents.classList.add('bg-blue-50', 'text-blue-700');
+                navEvents.classList.remove('text-slate-500');
+                navParts.classList.remove('bg-blue-50', 'text-blue-700');
+                navParts.classList.add('text-slate-500');
+                headerActions.classList.remove('hidden');
+                await loadEvents();
+            } else {
+                eventsContent.classList.add('hidden');
+                participantsContent.classList.remove('hidden');
+                title.textContent = 'Indice de Participantes';
+                subtitle.textContent = 'Todos os inscritos em seus sorteios';
+                navParts.classList.add('bg-blue-50', 'text-blue-700');
+                navParts.classList.remove('text-slate-500');
+                navEvents.classList.remove('bg-blue-50', 'text-blue-700');
+                navEvents.classList.add('text-slate-500');
+                headerActions.classList.add('hidden');
+                await loadParticipants();
+            }
+        };
+
+        document.getElementById('nav-events').addEventListener('click', (e) => { e.preventDefault(); switchView('events'); });
+        document.getElementById('nav-participants').addEventListener('click', (e) => { e.preventDefault(); switchView('participants'); });
 
         const testConnectivity = async () => {
             const statusDiv = document.getElementById('connection-status');
@@ -272,18 +379,20 @@
             const text = statusDiv.querySelector('.status-text');
             const alert = document.getElementById('db-error-alert');
 
+            console.log("Testing connection to Supabase...");
             try {
-                // Try a simple read to check connection (even if empty)
-                const { error, count } = await supabase.from('eventos').select('*', { count: 'exact', head: true }).limit(1);
+                // Try a very simple read
+                const { error } = await supabase.from('eventos').select('id').limit(1);
                 
-                if (error) throw error;
+                if (error) {
+                    if (error.code !== 'PGRST116') throw error;
+                }
 
                 statusDiv.classList.replace('bg-slate-50', 'bg-emerald-50');
                 statusDiv.classList.replace('text-slate-400', 'text-emerald-600');
                 dot.classList.replace('bg-slate-300', 'bg-emerald-500');
                 text.textContent = 'Banco Conectado';
                 alert.classList.add('hidden');
-                console.log("Supabase Connection Successful. Table access verified.");
             } catch (err) {
                 console.error("DB Connection Error:", err);
                 statusDiv.classList.replace('bg-slate-50', 'bg-red-50');
@@ -292,10 +401,13 @@
                 text.textContent = 'Erro de Conexão';
                 alert.classList.remove('hidden');
                 alert.innerHTML = `
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    <div>
-                        <p class="text-sm font-bold">Falha na conexão com o Banco de Dados.</p>
-                        <p class="text-[10px] mt-1 opacity-80">Erro: ${err.message || 'Desconhecido'}. Verifique suas chaves no menu Settings.</p>
+                    <div class="flex gap-3">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <div>
+                            <p class="text-sm font-bold">Falha na conexão com o Banco de Dados.</p>
+                            <p class="text-[10px] mt-1 opacity-80 italic">Mensagem: ${err.message || 'Erro desconhecido'}</p>
+                            <p class="text-[9px] mt-2 font-medium bg-red-100/50 p-2 rounded-lg">Dica: Verifique se você executou o SQL de criação das tabelas no painel do Supabase (botão SQL Editor).</p>
+                        </div>
                     </div>
                 `;
             }
@@ -399,6 +511,112 @@
                 console.error("Error loading events:", err);
             }
         };
+
+        const loadParticipants = async () => {
+            const tableBody = document.getElementById('participants-table-body');
+            const totalCountSpan = document.getElementById('total-participants-count');
+            const emptyState = document.getElementById('participants-empty');
+            
+            try {
+                // Fetch all events for this coordinator first
+                const { data: events } = await supabase
+                    .from('eventos')
+                    .select('id, nome')
+                    .eq('coordenador_id', currentUser.id);
+                
+                if (!events || events.length === 0) {
+                    tableBody.innerHTML = '';
+                    totalCountSpan.textContent = '0';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                const eventIds = events.map(e => e.id);
+                const eventMap = events.reduce((acc, e) => ({ ...acc, [e.id]: e.nome }), {});
+
+                const { data: participants, error } = await supabase
+                    .from('participantes')
+                    .select('*')
+                    .in('evento_id', eventIds)
+                    .order('criado_em', { ascending: false });
+
+                if (error) throw error;
+
+                allParticipants = participants.map(p => ({
+                    ...p,
+                    evento_nome: eventMap[p.evento_id] || 'Desconhecido'
+                }));
+
+                renderParticipants(allParticipants);
+                totalCountSpan.textContent = allParticipants.length;
+
+            } catch (err) {
+                console.error("Error loading participants:", err);
+            }
+        };
+
+        const renderParticipants = (list) => {
+            const tableBody = document.getElementById('participants-table-body');
+            const emptyState = document.getElementById('participants-empty');
+            
+            tableBody.innerHTML = '';
+            
+            if (list.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            list.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 transition-colors group';
+                
+                const date = new Date(p.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">
+                                ${p.nome.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">${p.nome}</p>
+                                <p class="text-[10px] text-slate-400 font-medium">${p.telefone}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">${p.evento_nome}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex flex-wrap justify-center gap-1">
+                            ${p.numeros.map(num => `<span class="inline-block w-6 h-6 leading-6 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">${num}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500 font-medium">
+                        ${date}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="window.open('https://wa.me/55${p.telefone.replace(/\D/g, '')}', '_blank')" class="p-2 text-slate-300 hover:text-green-500 transition-all transform hover:scale-110" title="Conversar no WhatsApp">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.208 1.888-4.208 4.208 0 .744.192 1.44.528 2.053l-.561 2.053 2.103-.551a4.17 4.17 0 0 0 2.139.589c2.32 0 4.208-1.888 4.208-4.208s-1.888-4.208-4.208-4.208zm2.492 6.003c-.102.284-.592.541-.812.576-.22.035-.436.059-.728-.035-.292-.094-1.246-.46-2.373-1.465-.877-.784-1.469-1.753-1.641-2.046-.172-.293-.018-.452.129-.597.132-.131.293-.341.44-.511.146-.171.195-.284.293-.474.098-.189.049-.356-.024-.499-.073-.142-.656-1.581-.899-2.164-.236-.566-.475-.49-.656-.499-.17-.009-.366-.01-.561-.01-.195 0-.512.073-.78.366-.268.293-1.024 1-1.024 2.439 0 1.439 1.049 2.829 1.195 3.024.146.195 2.064 3.151 5.001 4.417.699.301 1.244.481 1.669.616.702.223 1.341.191 1.846.116.564-.084 1.732-.707 1.976-1.39.244-.683.244-1.268.171-1.39-.073-.122-.268-.195-.561-.341z"/></svg>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        };
+
+        // Search logic
+        document.getElementById('search-participants').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allParticipants.filter(p => 
+                p.nome.toLowerCase().includes(term) || 
+                p.telefone.includes(term) ||
+                p.evento_nome.toLowerCase().includes(term)
+            );
+            renderParticipants(filtered);
+        });
 
         const updateStats = (totalEvents, totalParts, totalPrizes) => {
             document.getElementById('stat-total-events').textContent = totalEvents;
@@ -511,14 +729,17 @@
                 const event = insertResponse.data;
 
                 if (eventError) {
-                    console.error("DB Insert Error:", eventError);
+                    console.error("Detailed DB Insert Error:", eventError);
                     if (eventError.message.includes('unique')) {
                         throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
                     }
                     if (eventError.code === '42501') {
-                        throw new Error("Permissão negada (RLS). Verifique se as tabelas e políticas de segurança foram criadas corretamente.");
+                        throw new Error("Permissão negada (RLS). Verifique se as Tabelas e as Políticas de Segurança (Policies) foram criadas corretamente no painel do Supabase.");
                     }
-                    throw eventError;
+                    if (eventError.code === '23503') {
+                        throw new Error("Erro de integridade (Foreign Key). Certifique-se de que seu perfil de coordenador foi criado corretamente.");
+                    }
+                    throw new Error(`Erro do Supabase (${eventError.code}): ${eventError.message}`);
                 }
                 
                 if (!event) throw new Error("O servidor não retornou os dados do evento criado.");
@@ -560,10 +781,67 @@
             }
         });
 
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+
+        // Backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300 opacity-0';
+        document.body.appendChild(backdrop);
+
+        const toggleSidebar = () => {
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            }
+        };
+
+        if (openSidebarBtn) openSidebarBtn.addEventListener('click', toggleSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+        backdrop.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on navigation (mobile)
+        document.querySelectorAll('#sidebar nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) toggleSidebar();
+            });
+        });
+
         // Logout
-        document.getElementById('btn-logout').addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '/index.html';
+        const handleLogout = async (e) => {
+            if (e) e.preventDefault();
+            console.log("Logout triggered...");
+            try {
+                await supabase.auth.signOut();
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.replace('index.html');
+            } catch (err) {
+                console.error("Erro ao sair:", err);
+                window.location.href = 'index.html';
+            }
+        };
+
+        const btnLogout = document.getElementById('btn-logout');
+        const btnLogoutHeader = document.getElementById('btn-logout-header');
+        
+        if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+        if (btnLogoutHeader) btnLogoutHeader.addEventListener('click', handleLogout);
+
+        // Show connection error details on click
+        document.getElementById('connection-status').addEventListener('click', () => {
+            const alert = document.getElementById('db-error-alert');
+            const stText = document.querySelector('.status-text').textContent;
+            if (stText === 'Erro de Conexão') {
+                alert.classList.toggle('hidden');
+            }
         });
 
         // Copy Link
