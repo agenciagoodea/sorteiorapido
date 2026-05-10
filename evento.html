@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SorteioFácil - Inscrição</title>
+    <title>SorteioFÃ¡cil - InscriÃ§Ã£o</title>
     <link rel="stylesheet" href="/src/index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,9 +63,9 @@
 
     <div id="error-screen" class="hidden min-h-screen flex items-center justify-center p-6">
         <div class="max-w-md bg-white rounded-2xl p-8 border border-slate-200 shadow-xl text-center">
-            <div class="text-4xl mb-3">⚠️</div>
-            <h2 class="text-2xl font-black mb-2">Evento não encontrado</h2>
-            <p class="text-slate-500">O link pode estar inválido ou o evento não está disponível.</p>
+            <div class="text-4xl mb-3">âš ï¸</div>
+            <h2 class="text-2xl font-black mb-2">Evento nÃ£o encontrado</h2>
+            <p class="text-slate-500">O link pode estar invÃ¡lido ou o evento nÃ£o estÃ¡ disponÃ­vel.</p>
         </div>
     </div>
 
@@ -73,9 +73,9 @@
         <section class="relative min-h-[390px] md:min-h-[460px] overflow-hidden">
             <div id="hero-cover" class="hero-bg absolute inset-0 bg-slate-900 bg-cover bg-center"></div>
             <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-28 text-white text-center">
-                <span id="hero-status" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide bg-emerald-500/90 mb-4">✅ Inscrições abertas</span>
+                <span id="hero-status" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide bg-emerald-500/90 mb-4">âœ… InscriÃ§Ãµes abertas</span>
                 <h1 id="event-name" class="text-4xl sm:text-5xl md:text-6xl font-black leading-tight">Evento</h1>
-                <p id="event-desc" class="mt-3 text-slate-100/90 max-w-2xl mx-auto">Descrição do evento</p>
+                <p id="event-desc" class="mt-3 text-slate-100/90 max-w-2xl mx-auto">DescriÃ§Ã£o do evento</p>
 
                 <div class="mt-8 max-w-2xl mx-auto bg-white/10 rounded-2xl border border-white/20 backdrop-blur-sm p-4 text-left">
                     <div class="flex items-center justify-between mb-2 text-sm font-semibold">
@@ -102,63 +102,53 @@
                         <input id="part-phone" required type="tel" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="(99) 99999-9999">
                     </div>
                     <button id="btn-submit" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-black transition-all flex items-center justify-center gap-2">
-                        🎟️ Garantir meu número!
+                        ðŸŽŸï¸ Garantir meu nÃºmero!
                     </button>
                 </form>
             </div>
 
             <div id="closed-card" class="hidden max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-8 text-center">
-                <h3 class="text-2xl font-black mb-2">Inscrições encerradas</h3>
-                <p class="text-slate-500">Este evento não está mais aceitando novas inscrições.</p>
+                <h3 class="text-2xl font-black mb-2">InscriÃ§Ãµes encerradas</h3>
+                <p class="text-slate-500">Este evento nÃ£o estÃ¡ mais aceitando novas inscriÃ§Ãµes.</p>
             </div>
 
             <div id="success-card" class="hidden max-w-2xl mx-auto bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl shadow-xl p-8 text-center text-white">
-                <p class="text-xs font-black tracking-[0.2em] uppercase mb-2">Inscrição confirmada</p>
-                <h3 class="text-3xl font-black mb-6">Boa sorte! 🎉</h3>
+                <p class="text-xs font-black tracking-[0.2em] uppercase mb-2">InscriÃ§Ã£o confirmada</p>
+                <h3 class="text-3xl font-black mb-6">Boa sorte! ðŸŽ‰</h3>
                 <div class="bg-white text-slate-900 rounded-2xl p-6">
-                    <p class="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold">Seu número</p>
+                    <p class="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold">Seu nÃºmero</p>
                     <p id="ticket-number" class="text-6xl font-black text-blue-700">#000</p>
                 </div>
             </div>
         </section>
 
         <section class="max-w-6xl mx-auto px-4 sm:px-6 mt-14 pb-10">
-            <h3 class="text-2xl sm:text-3xl font-black mb-6">🎁 Prêmios que você pode ganhar</h3>
+            <h3 class="text-2xl sm:text-3xl font-black mb-6">ðŸŽ PrÃªmios que vocÃª pode ganhar</h3>
             <div id="prizes-list" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"></div>
         </section>
 
         <section id="winners-section" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pb-14">
-            <h3 class="text-2xl sm:text-3xl font-black mb-6">🏆 Ganhadores</h3>
+            <h3 class="text-2xl sm:text-3xl font-black mb-6">ðŸ† Ganhadores</h3>
             <div id="winners-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <footer class="py-10 text-center text-sm text-slate-500">Sorteio realizado pela plataforma SorteioFácil</footer>
+        <footer class="py-10 text-center text-sm text-slate-500">Sorteio realizado pela plataforma SorteioFÃ¡cil</footer>
     </main>
 
     <div id="toast-container" class="fixed bottom-4 right-4 z-[70] space-y-2 w-[92vw] max-w-sm"></div>
 
     <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-        const getEnv = (key) => {
-            if (typeof window !== 'undefined' && window[key]) return window[key];
-            if (typeof process !== 'undefined' && process.env && process.env[key]) return process.env[key];
-            if (typeof import.meta.env !== 'undefined' && import.meta.env[key]) return import.meta.env[key];
-            return null;
-        };
-
-        const SUPABASE_URL = getEnv('VITE_SUPABASE_URL');
-        const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY');
-        const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
+        import { SUPABASE_URL, SUPABASE_ANON_KEY, isDefaultKey, getSupabaseClient } from '/src/supabase-client.js';
         if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
-            document.body.innerHTML = '<div class="min-h-screen flex items-center justify-center p-6">Configuração Supabase ausente.</div>';
+            document.body.innerHTML = '<div class="min-h-screen flex items-center justify-center p-6">ConfiguraÃ§Ã£o Supabase ausente.</div>';
             throw new Error('Supabase config missing');
         }
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = getSupabaseClient();
         const slug = new URLSearchParams(window.location.search).get('slug');
 
         let currentEvent = null;
+        const pageCache = {};
 
         const showToast = (message, type = 'info') => {
             const container = document.getElementById('toast-container');
@@ -184,7 +174,7 @@
                 return;
             }
             btn.disabled = false;
-            btn.innerHTML = btn.dataset.originalText || '🎟️ Garantir meu número!';
+            btn.innerHTML = btn.dataset.originalText || 'ðŸŽŸï¸ Garantir meu nÃºmero!';
         };
 
         const maskPhoneInput = (value) => {
@@ -206,7 +196,7 @@
         const updateHero = async () => {
             const { count } = await supabase
                 .from('participantes')
-                .select('*', { count: 'exact', head: true })
+                .select('id', { count: 'exact', head: true })
                 .eq('evento_id', currentEvent.id);
 
             const inscritos = count || 0;
@@ -227,12 +217,12 @@
 
             if (currentEvent.status === 'aberto' && vagasRestantes > 0) {
                 statusEl.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide bg-emerald-500/90 mb-4';
-                statusEl.textContent = '✅ Inscrições abertas';
+                statusEl.textContent = 'âœ… InscriÃ§Ãµes abertas';
                 document.getElementById('form-card').classList.remove('hidden');
                 document.getElementById('closed-card').classList.add('hidden');
             } else {
                 statusEl.className = 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide bg-red-500/90 mb-4';
-                statusEl.textContent = '❌ Inscrições encerradas';
+                statusEl.textContent = 'âŒ InscriÃ§Ãµes encerradas';
                 document.getElementById('form-card').classList.add('hidden');
                 document.getElementById('closed-card').classList.remove('hidden');
             }
@@ -246,11 +236,20 @@
         };
 
         const loadPrizes = async () => {
-            const { data } = await supabase
-                .from('premios')
-                .select('id, nome_parceiro, descricao, imagem, ordem')
-                .eq('evento_id', currentEvent.id)
-                .order('ordem', { ascending: true });
+            const cacheKey = `prizes_${currentEvent.id}`;
+            const now = Date.now();
+            let data = null;
+            if (pageCache[cacheKey] && now - pageCache[cacheKey].ts < 60000) {
+                data = pageCache[cacheKey].data;
+            } else {
+                const { data: rows } = await supabase
+                    .from('premios')
+                    .select('id, nome_parceiro, descricao, imagem, ordem')
+                    .eq('evento_id', currentEvent.id)
+                    .order('ordem', { ascending: true });
+                data = rows || [];
+                pageCache[cacheKey] = { data, ts: now };
+            }
 
             const list = document.getElementById('prizes-list');
             list.innerHTML = '';
@@ -260,7 +259,7 @@
                 card.innerHTML = `
                     <div class="gold-border-inner p-3 flex flex-col h-full rounded-2xl">
                         <div class="h-28 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center text-3xl">
-                            ${prize.imagem ? `<img src="${prize.imagem}" alt="Prêmio" class="w-full h-full object-cover">` : '🎁'}
+                            ${prize.imagem ? `<img loading="lazy" src="${prize.imagem}" alt="PrÃªmio" class="w-full h-full object-cover">` : 'ðŸŽ'}
                         </div>
                         <div class="mt-3">
                             <p class="text-sm font-black text-slate-800 line-clamp-1">${prize.nome_parceiro}</p>
@@ -288,10 +287,10 @@
                 card.className = 'bg-white border border-slate-200 rounded-2xl p-4 shadow-sm';
                 card.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center">${item.imagem ? `<img src="${item.imagem}" class="w-full h-full object-cover">` : '🎁'}</div>
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center">${item.imagem ? `<img loading="lazy" src="${item.imagem}" class="w-full h-full object-cover">` : 'ðŸŽ'}</div>
                         <div>
                             <p class="text-sm font-bold text-slate-800">${item.descricao}</p>
-                            <p class="text-xs text-slate-500">${number} • ${p.nome || 'Não divulgado'}</p>
+                            <p class="text-xs text-slate-500">${number} â€¢ ${p.nome || 'NÃ£o divulgado'}</p>
                             <p class="text-xs text-slate-400">${maskPhoneDisplay(p.whatsapp || '')}</p>
                         </div>
                     </div>
@@ -305,7 +304,7 @@
             document.getElementById('success-card').classList.remove('hidden');
             document.getElementById('ticket-number').textContent = `#${String(ticket).padStart(3, '0')}`;
             confetti({ particleCount: 180, spread: 85, origin: { y: 0.6 } });
-            showToast('Inscrição realizada com sucesso!', 'success');
+            showToast('InscriÃ§Ã£o realizada com sucesso!', 'success');
         };
 
         const init = async () => {
@@ -317,7 +316,7 @@
 
             const { data: eventData, error } = await supabase
                 .from('eventos')
-                .select('*')
+                .select('id, nome, descricao, imagem_capa, max_numeros, status, slug')
                 .eq('slug', slug)
                 .single();
 
@@ -329,12 +328,11 @@
 
             currentEvent = eventData;
             document.getElementById('event-name').textContent = eventData.nome;
-            document.getElementById('event-desc').textContent = eventData.descricao || 'Participe e concorra aos prêmios deste evento!';
+            document.getElementById('event-desc').textContent = eventData.descricao || 'Participe e concorra aos prÃªmios deste evento!';
             const heroCover = document.getElementById('hero-cover');
             heroCover.style.backgroundImage = eventData.imagem_capa ? `url('${eventData.imagem_capa}')` : 'linear-gradient(135deg,#0f172a,#1e3a8a,#312e81)';
 
-            await loadPrizes();
-            await updateHero();
+            await Promise.all([loadPrizes(), updateHero()]);
 
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('app-content').classList.remove('hidden');
@@ -358,7 +356,7 @@
             if (error) throw error;
 
             const used = new Set((usedRows || []).map((r) => Number(r.numero_inscricao)).filter((n) => Number.isInteger(n) && n > 0));
-            if (used.size >= maxNumbers) throw new Error('Todas as vagas já foram preenchidas.');
+            if (used.size >= maxNumbers) throw new Error('Todas as vagas jÃ¡ foram preenchidas.');
 
             const maxAttempts = Math.max(50, maxNumbers * 2);
             for (let i = 0; i < maxAttempts; i++) {
@@ -370,7 +368,7 @@
                 if (!used.has(n)) return n;
             }
 
-            throw new Error('Não foi possível gerar número de inscrição disponível.');
+            throw new Error('NÃ£o foi possÃ­vel gerar nÃºmero de inscriÃ§Ã£o disponÃ­vel.');
         };
 
         document.getElementById('inscription-form').addEventListener('submit', async (e) => {
@@ -385,23 +383,24 @@
                     return;
                 }
 
-                const { count: currentCount } = await supabase
-                    .from('participantes')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('evento_id', currentEvent.id);
+                const [{ count: currentCount }, { data: existing }] = await Promise.all([
+                    supabase
+                        .from('participantes')
+                        .select('id', { count: 'exact', head: true })
+                        .eq('evento_id', currentEvent.id),
+                    supabase
+                        .from('participantes')
+                        .select('numero_inscricao')
+                        .eq('evento_id', currentEvent.id)
+                        .eq('whatsapp', phone)
+                        .maybeSingle()
+                ]);
 
                 if ((currentCount || 0) >= currentEvent.max_numeros || currentEvent.status !== 'aberto') {
-                    showToast('Inscrições encerradas para este evento.', 'error');
+                    showToast('InscriÃ§Ãµes encerradas para este evento.', 'error');
                     await updateHero();
                     return;
                 }
-
-                const { data: existing } = await supabase
-                    .from('participantes')
-                    .select('numero_inscricao')
-                    .eq('evento_id', currentEvent.id)
-                    .eq('whatsapp', phone)
-                    .maybeSingle();
 
                 if (existing?.numero_inscricao) {
                     showSuccess(existing.numero_inscricao);
@@ -430,16 +429,16 @@
                         break;
                     }
 
-                    insertError = error || new Error('Falha ao registrar inscrição.');
+                    insertError = error || new Error('Falha ao registrar inscriÃ§Ã£o.');
                     if (!String(insertError?.message || '').toLowerCase().includes('unique')) break;
                 }
 
-                if (!created) throw insertError || new Error('Falha ao registrar inscrição.');
+                if (!created) throw insertError || new Error('Falha ao registrar inscriÃ§Ã£o.');
                 showSuccess(created.numero_inscricao);
                 await updateHero();
             } catch (err) {
-                const msg = err?.message || 'Erro ao concluir inscrição.';
-                showToast(msg.includes('unique') ? 'Este telefone já está inscrito.' : msg, 'error');
+                const msg = err?.message || 'Erro ao concluir inscriÃ§Ã£o.';
+                showToast(msg.includes('unique') ? 'Este telefone jÃ¡ estÃ¡ inscrito.' : msg, 'error');
             } finally {
                 setButtonLoading(false);
             }
@@ -449,3 +448,4 @@
     </script>
 </body>
 </html>
+

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel - SorteioFácil</title>
+    <title>Painel - SorteioFÃƒÂ¡cil</title>
     <link rel="stylesheet" href="/src/index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,8 +32,25 @@
             border-top-color: #ffffff;
             animation: spin .7s linear infinite;
         }
+        .field-spinner {
+            width: 16px;
+            height: 16px;
+            border-radius: 9999px;
+            border: 2px solid rgba(100, 116, 139, 0.35);
+            border-top-color: #475569;
+            animation: spin .7s linear infinite;
+        }
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+        .skeleton {
+            animation: pulse 1.5s infinite;
+            background: #e5e7eb;
+            border-radius: 6px;
         }
         #toast-container .toast {
             transform: translateY(10px);
@@ -55,7 +72,7 @@
                     <div class="bg-blue-600 p-2 rounded-lg text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
                     </div>
-                    <span class="font-bold text-xl tracking-tight text-blue-900">SorteioFácil</span>
+                    <span class="font-bold text-xl tracking-tight text-blue-900">SorteioFÃƒÂ¡cil</span>
                 </div>
                 <button id="close-sidebar" class="lg:hidden text-slate-400 p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -72,9 +89,9 @@
                 </a>
             </nav>
             <div class="p-4 border-t border-slate-100 bg-slate-50/50">
-                <div id="connection-status" class="mb-4 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 bg-white border border-slate-200 text-slate-400 cursor-help" title="Clique para detalhes da conexão">
+                <div id="connection-status" class="mb-4 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 bg-white border border-slate-200 text-slate-400 cursor-help" title="Clique para detalhes da conexÃƒÂ£o">
                     <div class="w-2 h-2 rounded-full bg-slate-300 status-dot"></div>
-                    <span class="status-text">Testando Conexão...</span>
+                    <span class="status-text">Testando ConexÃƒÂ£o...</span>
                 </div>
                 <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm mb-3">
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold uppercase shrink-0" id="avatar-circle">?</div>
@@ -137,7 +154,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-bold text-slate-700">Nenhum evento criado</h3>
-                        <p class="text-slate-500 max-w-sm mt-2 mb-6">Comece agora criando seu primeiro sorteio para engajar sua audiência.</p>
+                        <p class="text-slate-500 max-w-sm mt-2 mb-6">Comece agora criando seu primeiro sorteio para engajar sua audiÃƒÂªncia.</p>
                         <button onclick="document.getElementById('open-create-modal').click()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100">Criar agora &rarr;</button>
                     </div>
                 </div>
@@ -166,6 +183,9 @@
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                     </span>
                                     <input type="text" id="search-participants" placeholder="Buscar por nome ou celular..." class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm">
+                                    <span id="participants-search-spinner" class="hidden absolute inset-y-0 right-0 pr-4 items-center text-slate-400">
+                                        <span class="field-spinner"></span>
+                                    </span>
                                 </div>
                                 <select id="participants-event-filter" class="w-full md:w-64 px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-semibold text-sm text-slate-700">
                                     <option value="">Todos os eventos</option>
@@ -201,6 +221,13 @@
                         <div id="participants-empty" class="hidden p-20 text-center">
                             <p class="text-slate-400 font-medium">Nenhum participante encontrado.</p>
                         </div>
+                        <div id="participants-pagination" class="hidden p-4 border-t border-slate-100 bg-slate-50/60">
+                            <div class="flex items-center justify-between gap-3">
+                                <button id="participants-prev-page" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed">Anterior</button>
+                                <span id="participants-page-indicator" class="text-xs font-bold text-slate-500 tracking-wide">PÃƒÆ’Ã‚Â¡gina 1 de 1</span>
+                                <button id="participants-next-page" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed">PrÃƒÆ’Ã‚Â³ximo</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -226,7 +253,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Prêmios</p>
+                        <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">PrÃƒÂªmios</p>
                         <p id="stat-pending-prizes" class="font-bold text-slate-900">0 Cadastrados</p>
                     </div>
                 </div>
@@ -238,7 +265,7 @@
             <h4 class="font-bold text-slate-800 mb-4 tracking-tight">Atividade Recente</h4>
             <div id="recent-activity" class="space-y-4">
                 <div class="p-4 bg-white rounded-xl border border-slate-200 text-center py-10">
-                    <p class="text-sm text-slate-400">Suas atividades aparecerão aqui conforme os participantes se inscreverem.</p>
+                    <p class="text-sm text-slate-400">Suas atividades aparecerÃƒÂ£o aqui conforme os participantes se inscreverem.</p>
                 </div>
             </div>
         </aside>
@@ -253,7 +280,7 @@
                 <div class="flex items-center justify-between mb-8">
                     <div>
                         <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tight">Novo Evento</h3>
-                        <p id="modal-subtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configuração do Sorteio</p>
+                        <p id="modal-subtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">ConfiguraÃƒÂ§ÃƒÂ£o do Sorteio</p>
                     </div>
                     <button class="modal-close w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -278,7 +305,7 @@
                     </div>
 
                     <div class="group">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Descrição</label>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">DescriÃƒÂ§ÃƒÂ£o</label>
                         <textarea id="event-desc" rows="2" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium" placeholder="Detalhes do sorteio..."></textarea>
                     </div>
 
@@ -291,13 +318,13 @@
                     </div>
 
                     <div class="group">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Limite Máximo</label>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Limite MÃƒÂ¡ximo</label>
                         <input type="number" id="event-max" required value="100" min="1" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-bold">
                     </div>
 
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Prêmios</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">PrÃƒÂªmios</label>
                             <button type="button" id="add-prize" class="text-blue-600 font-black text-[10px] uppercase tracking-widest hover:text-blue-700 flex items-center gap-1 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                                 Adicionar
@@ -359,33 +386,20 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-        // Robust environment variable access
-        const getEnv = (key) => {
-            if (typeof window !== 'undefined' && window[key]) return window[key];
-            if (typeof process !== 'undefined' && process.env && process.env[key]) return process.env[key];
-            if (typeof import.meta.env !== 'undefined' && import.meta.env[key]) return import.meta.env[key];
-            return null;
-        };
-
-        const SUPABASE_URL = getEnv('VITE_SUPABASE_URL');
-        const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY');
+        import { SUPABASE_URL, SUPABASE_ANON_KEY, isDefaultKey, getSupabaseClient } from '/src/supabase-client.js';
 
         console.log("Supabase Config Detected:", { 
             url: SUPABASE_URL ? "Exists" : "Missing", 
             key: SUPABASE_ANON_KEY ? "Exists" : "Missing" 
         });
 
-        const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
-
         if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
             document.body.innerHTML = `
                 <div class="min-h-screen flex items-center justify-center bg-slate-50 p-6 text-center">
                     <div class="max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-red-100">
-                        <div class="text-4xl mb-4">⚙️</div>
-                        <h1 class="text-xl font-bold text-slate-800 mb-2">Configuração Necessária</h1>
-                        <p class="text-slate-500 text-sm">As chaves do Supabase não foram encontradas no ambiente.</p>
+                        <div class="text-4xl mb-4">Ã¢Å¡â„¢Ã¯Â¸</div>
+                        <h1 class="text-xl font-bold text-slate-800 mb-2">ConfiguraÃƒÂ§ÃƒÂ£o NecessÃƒÂ¡ria</h1>
+                        <p class="text-slate-500 text-sm">As chaves do Supabase nÃƒÂ£o foram encontradas no ambiente.</p>
                         <p class="text-slate-400 text-xs mt-4 italic">Certifique-se de configurar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no menu Settings.</p>
                     </div>
                 </div>
@@ -393,7 +407,7 @@
             throw new Error("Supabase configuration missing");
         }
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = getSupabaseClient();
 
         let currentUser = null;
         let allParticipants = [];
@@ -405,6 +419,13 @@
         let currentCoverBase64 = null;
         let pendingDeleteAction = null;
         let pendingClearEventId = null;
+        let participantsPage = 1;
+        const participantsPageSize = 20;
+        let participantsTotalCount = 0;
+        let participantsTotalPages = 1;
+        let participantsSearchDebounce = null;
+        const runtimeCache = {};
+        const STATE_KEY = 'dashboard_ui_state_v1';
 
         const showToast = (message, type = 'info') => {
             const container = document.getElementById('toast-container');
@@ -458,7 +479,110 @@
                 return;
             }
             preview.classList.add('p-0');
-            preview.innerHTML = `<img src="${base64}" class="w-full h-full object-cover" alt="Capa do evento">`;
+            preview.innerHTML = `<img loading="lazy" src="${base64}" class="w-full h-full object-cover" alt="Capa do evento">`;
+        };
+
+        const getCache = (key, ttlMs) => {
+            const item = runtimeCache[key];
+            if (!item) return null;
+            if (Date.now() - item.ts > ttlMs) return null;
+            return item.data;
+        };
+
+        const setCache = (key, data) => {
+            runtimeCache[key] = { data, ts: Date.now() };
+            return data;
+        };
+
+        const invalidateCachePrefix = (prefix) => {
+            Object.keys(runtimeCache)
+                .filter(k => k.startsWith(prefix))
+                .forEach(k => delete runtimeCache[k]);
+        };
+
+        const getCoordinatorEventsCached = async (force = false) => {
+            const key = `eventos_${currentUser.id}`;
+            if (!force) {
+                const cached = getCache(key, 30000);
+                if (cached) return cached;
+            }
+            const { data, error } = await supabase
+                .from('eventos')
+                .select('id, nome, slug, descricao, status, max_numeros, criado_em')
+                .eq('coordenador_id', currentUser.id)
+                .order('criado_em', { ascending: false });
+            if (error) throw error;
+            return setCache(key, data || []);
+        };
+
+        const getEventPrizesCached = async (eventId, force = false) => {
+            const key = `premios_${eventId}`;
+            if (!force) {
+                const cached = getCache(key, 60000);
+                if (cached) return cached;
+            }
+            const { data, error } = await supabase
+                .from('premios')
+                .select('id, nome_parceiro, descricao, imagem, ordem')
+                .eq('evento_id', eventId)
+                .order('ordem', { ascending: true });
+            if (error) throw error;
+            return setCache(key, data || []);
+        };
+
+        const renderEventSkeletons = () => {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = Array.from({ length: 3 }).map(() => `
+                <div class="bg-white rounded-3xl border border-slate-200 p-5 space-y-4">
+                    <div class="skeleton h-40 w-full"></div>
+                    <div class="skeleton h-5 w-1/3"></div>
+                    <div class="skeleton h-8 w-3/4"></div>
+                    <div class="skeleton h-3 w-full"></div>
+                    <div class="skeleton h-3 w-5/6"></div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <div class="skeleton h-10"></div>
+                        <div class="skeleton h-10"></div>
+                        <div class="skeleton h-10"></div>
+                        <div class="skeleton h-10"></div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        const renderParticipantsSkeleton = () => {
+            const tableBody = document.getElementById('participants-table-body');
+            const emptyState = document.getElementById('participants-empty');
+            emptyState.classList.add('hidden');
+            tableBody.innerHTML = Array.from({ length: 5 }).map(() => `
+                <tr>
+                    <td class="px-4 py-4"><div class="skeleton h-4 w-4 mx-auto"></div></td>
+                    <td class="px-6 py-4"><div class="skeleton h-5 w-44"></div></td>
+                    <td class="px-6 py-4"><div class="skeleton h-5 w-32"></div></td>
+                    <td class="px-6 py-4"><div class="skeleton h-5 w-16 mx-auto"></div></td>
+                    <td class="px-6 py-4"><div class="skeleton h-5 w-24"></div></td>
+                    <td class="px-6 py-4"><div class="skeleton h-9 w-9 ml-auto"></div></td>
+                </tr>
+            `).join('');
+        };
+
+        const saveUIState = () => {
+            const payload = {
+                currentView,
+                participantsPage,
+                participantsFilter: document.getElementById('participants-event-filter')?.value || '',
+                participantsSearch: document.getElementById('search-participants')?.value || '',
+                scrollY: window.scrollY || 0
+            };
+            sessionStorage.setItem(STATE_KEY, JSON.stringify(payload));
+        };
+
+        const loadUIState = () => {
+            try {
+                const raw = sessionStorage.getItem(STATE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch {
+                return null;
+            }
         };
 
         const escapeHtml = (value = '') => String(value)
@@ -484,8 +608,9 @@
         };
 
         const pruneSelectedParticipants = () => {
-            const validIds = new Set(allParticipants.map(p => p.id));
-            selectedParticipantIds = new Set([...selectedParticipantIds].filter(id => validIds.has(id)));
+            if (participantsTotalCount === 0) {
+                selectedParticipantIds.clear();
+            }
         };
 
         const updateBulkSelectionBar = () => {
@@ -603,12 +728,27 @@
                 document.getElementById('avatar-circle').textContent = initials;
             }
             
-            // Initial View
-            switchView('events');
+            // Initial View (restore state when available)
+            const persisted = loadUIState();
+            if (persisted?.participantsSearch) {
+                document.getElementById('search-participants').value = persisted.participantsSearch;
+            }
+            if (Number.isInteger(persisted?.participantsPage) && persisted.participantsPage > 0) {
+                participantsPage = persisted.participantsPage;
+            }
+            if (persisted?.participantsFilter) {
+                const filter = document.getElementById('participants-event-filter');
+                if (filter) filter.value = persisted.participantsFilter;
+            }
+            await switchView(persisted?.currentView || 'events');
+            if (typeof persisted?.scrollY === 'number') {
+                window.scrollTo({ top: persisted.scrollY, behavior: 'auto' });
+            }
         };
 
         const switchView = async (view) => {
             currentView = view;
+            saveUIState();
             const eventsContent = document.getElementById('view-events-content');
             const participantsContent = document.getElementById('view-participants-content');
             const title = document.getElementById('view-title');
@@ -644,6 +784,24 @@
 
         document.getElementById('nav-events').addEventListener('click', (e) => { e.preventDefault(); switchView('events'); });
         document.getElementById('nav-participants').addEventListener('click', (e) => { e.preventDefault(); switchView('participants'); });
+        document.getElementById('nav-events').addEventListener('mouseenter', async () => {
+            if (!currentUser) return;
+            try {
+                await getCoordinatorEventsCached();
+                if (currentView !== 'events') {
+                    await loadEvents();
+                }
+            } catch {}
+        });
+        document.getElementById('nav-participants').addEventListener('mouseenter', async () => {
+            if (!currentUser) return;
+            try {
+                await getCoordinatorEventsCached();
+                if (currentView !== 'participants') {
+                    await loadParticipants();
+                }
+            } catch {}
+        });
 
         const testConnectivity = async () => {
             const statusDiv = document.getElementById('connection-status');
@@ -672,15 +830,15 @@
                 statusDiv.classList.add('bg-red-50', 'text-red-600', 'border-red-100');
                 dot.classList.remove('bg-slate-300', 'bg-emerald-500');
                 dot.classList.add('bg-red-500');
-                text.textContent = 'Erro de Conexão';
+                text.textContent = 'Erro de ConexÃƒÂ£o';
                 alert.classList.remove('hidden');
                 alert.innerHTML = `
                     <div class="flex gap-3">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         <div>
-                            <p class="text-sm font-bold">Falha na conexão com o Banco de Dados.</p>
+                            <p class="text-sm font-bold">Falha na conexÃƒÂ£o com o Banco de Dados.</p>
                             <p class="text-[10px] mt-1 opacity-80 italic">Mensagem: ${err.message || 'Erro desconhecido'}</p>
-                            <p class="text-[9px] mt-2 font-medium bg-red-100/50 p-2 rounded-lg">Dica: Verifique se você executou o SQL de criação das tabelas no painel do Supabase (botão SQL Editor).</p>
+                            <p class="text-[9px] mt-2 font-medium bg-red-100/50 p-2 rounded-lg">Dica: Verifique se vocÃƒÂª executou o SQL de criaÃƒÂ§ÃƒÂ£o das tabelas no painel do Supabase (botÃƒÂ£o SQL Editor).</p>
                         </div>
                     </div>
                 `;
@@ -692,14 +850,11 @@
             const empty = document.getElementById('empty-state');
             
             try {
-                const { data: events, error } = await supabase
-                    .from('eventos')
-                    .select('*')
-                    .eq('coordenador_id', currentUser.id)
-                    .order('criado_em', { ascending: false });
-
-                if (error) throw error;
-                coordinatorEvents = events || [];
+                if (!getCache(`eventos_${currentUser.id}`, 30000)) {
+                    renderEventSkeletons();
+                }
+                const events = await getCoordinatorEventsCached();
+                coordinatorEvents = events;
 
                 grid.innerHTML = '';
                 
@@ -711,30 +866,33 @@
                 
                 empty.classList.add('hidden');
                 
-                let totalParts = 0;
-                let totalPrizes = 0;
+                const eventIds = events.map(e => e.id);
+                const [{ data: participantRows }, { data: prizeRows }] = await Promise.all([
+                    supabase.from('participantes').select('evento_id').in('evento_id', eventIds),
+                    supabase.from('premios').select('evento_id').in('evento_id', eventIds)
+                ]);
+                const participantCountMap = (participantRows || []).reduce((acc, row) => {
+                    acc[row.evento_id] = (acc[row.evento_id] || 0) + 1;
+                    return acc;
+                }, {});
+                const prizeCountMap = (prizeRows || []).reduce((acc, row) => {
+                    acc[row.evento_id] = (acc[row.evento_id] || 0) + 1;
+                    return acc;
+                }, {});
+                const totalParts = Object.values(participantCountMap).reduce((sum, n) => sum + n, 0);
+                const totalPrizes = Object.values(prizeCountMap).reduce((sum, n) => sum + n, 0);
 
                 for (const event of events) {
-                    const { count: partCount } = await supabase
-                        .from('participantes')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('evento_id', event.id);
-
-                    const { count: prizeCount } = await supabase
-                        .from('premios')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('evento_id', event.id);
-
-                    totalParts += (partCount || 0);
-                    totalPrizes += (prizeCount || 0);
+                    const partCount = participantCountMap[event.id] || 0;
+                    const prizeCount = prizeCountMap[event.id] || 0;
 
                     const card = document.createElement('div');
                     card.className = 'event-card bg-white rounded-3xl border border-slate-200 overflow-hidden';
                     
                     const statusConfig = {
-                        'aberto': { class: 'bg-emerald-100 text-emerald-700', label: '🟢 Aberto' },
-                        'encerrado': { class: 'bg-amber-100 text-amber-700', label: '🟡 Encerrado' },
-                        'sorteado': { class: 'bg-blue-100 text-blue-700', label: '🏆 Sorteado' }
+                        'aberto': { class: 'bg-emerald-100 text-emerald-700', label: 'Ã°Å¸Å¸Â¢ Aberto' },
+                        'encerrado': { class: 'bg-amber-100 text-amber-700', label: 'Ã°Å¸Å¸Â¡ Encerrado' },
+                        'sorteado': { class: 'bg-blue-100 text-blue-700', label: 'Ã°Å¸â€  Sorteado' }
                     };
 
                     const config = statusConfig[event.status] || { class: 'bg-slate-100 text-slate-600', label: event.status };
@@ -743,10 +901,7 @@
                     const inscritos = Number(partCount) || 0;
                     const fillPct = maxNumbers > 0 ? Math.min(100, Math.max(0, (inscritos / maxNumbers) * 100)) : 0;
                     const progressColor = fillPct > 80 ? 'bg-red-500' : fillPct >= 50 ? 'bg-amber-500' : 'bg-emerald-500';
-                    const cover = event.imagem_capa || '';
-                    const coverHtml = cover
-                        ? `<img src="${cover}" alt="Capa do evento" class="w-full h-full object-cover">`
-                        : `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold cover-upload-preview">Sem capa</div>`;
+                    const coverHtml = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold cover-upload-preview"><i data-lucide="image" class="w-5 h-5 mr-2"></i>Sem capa na listagem</div>`;
 
                     card.innerHTML = `
                         <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-0">
@@ -768,13 +923,13 @@
                                 </div>
                                 <div>
                                     <h3 class="text-2xl font-black text-slate-800 leading-tight break-words">${event.nome}</h3>
-                                    <p class="text-slate-500 text-sm mt-1 line-clamp-2">${event.descricao || 'Nenhuma descrição fornecida.'}</p>
+                                    <p class="text-slate-500 text-sm mt-1 line-clamp-2">${event.descricao || 'Nenhuma descriÃƒÂ§ÃƒÂ£o fornecida.'}</p>
                                     <p class="text-xs text-slate-500 font-semibold mt-2">criado em ${formatDate(event.criado_em)}</p>
                                 </div>
 
                                 <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                     <div class="flex items-center justify-between text-xs font-semibold text-slate-600 mb-2">
-                                        <span>Inscrições</span>
+                                        <span>InscriÃƒÂ§ÃƒÂµes</span>
                                     </div>
                                     <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
                                         <div class="h-full ${progressColor} transition-all duration-700" style="width: ${fillPct}%"></div>
@@ -783,7 +938,7 @@
                                 </div>
 
                                 <div class="flex items-center justify-between text-xs text-slate-600">
-                                    <span class="font-semibold">Prêmios cadastrados</span>
+                                    <span class="font-semibold">PrÃƒÂªmios cadastrados</span>
                                     <span class="font-black text-slate-900">${prizeCount || 0}</span>
                                 </div>
 
@@ -821,23 +976,35 @@
             }
         };
 
-        const applyParticipantFilters = () => {
-            const term = document.getElementById('search-participants').value.trim().toLowerCase();
-            const eventId = document.getElementById('participants-event-filter').value;
+        const updateParticipantsPaginationUI = () => {
+            const wrap = document.getElementById('participants-pagination');
+            const indicator = document.getElementById('participants-page-indicator');
+            const prev = document.getElementById('participants-prev-page');
+            const next = document.getElementById('participants-next-page');
+            participantsTotalPages = Math.max(1, Math.ceil(participantsTotalCount / participantsPageSize));
+            if (participantsPage > participantsTotalPages) participantsPage = participantsTotalPages;
+            indicator.textContent = `PÃƒÂ¡gina ${participantsPage} de ${participantsTotalPages}`;
+            prev.disabled = participantsPage <= 1;
+            next.disabled = participantsPage >= participantsTotalPages;
+            wrap.classList.toggle('hidden', participantsTotalCount <= participantsPageSize);
+        };
 
-            filteredParticipants = allParticipants.filter(p => {
-                const termMatch = p.nome.toLowerCase().includes(term)
-                    || (p.whatsapp || '').toLowerCase().includes(term)
-                    || p.evento_nome.toLowerCase().includes(term);
-                const eventMatch = !eventId || p.evento_id === eventId;
-                return termMatch && eventMatch;
-            });
-
-            pruneSelectedParticipants();
-            renderParticipants(filteredParticipants);
-            document.getElementById('total-participants-count').textContent = String(filteredParticipants.length);
-            syncSelectAllCheckbox();
-            updateBulkSelectionBar();
+        const applyParticipantFilters = async ({ resetPage = false, showSpinner = false } = {}) => {
+            if (resetPage) participantsPage = 1;
+            if (showSpinner) {
+                const spinner = document.getElementById('participants-search-spinner');
+                spinner.classList.remove('hidden');
+                spinner.classList.add('flex');
+            }
+            try {
+                await loadParticipants();
+            } finally {
+                if (showSpinner) {
+                    const spinner = document.getElementById('participants-search-spinner');
+                    spinner.classList.add('hidden');
+                    spinner.classList.remove('flex');
+                }
+            }
         };
 
         const loadParticipants = async () => {
@@ -846,11 +1013,9 @@
             const emptyState = document.getElementById('participants-empty');
             
             try {
+                renderParticipantsSkeleton();
                 // Fetch all events for this coordinator first
-                const { data: events } = await supabase
-                    .from('eventos')
-                    .select('id, nome, max_numeros')
-                    .eq('coordenador_id', currentUser.id);
+                const events = await getCoordinatorEventsCached();
                 coordinatorEvents = events || [];
                 buildEventFilterOptions(coordinatorEvents);
                 
@@ -860,6 +1025,9 @@
                     tableBody.innerHTML = '';
                     totalCountSpan.textContent = '0';
                     emptyState.classList.remove('hidden');
+                    participantsTotalCount = 0;
+                    participantsTotalPages = 1;
+                    updateParticipantsPaginationUI();
                     clearSelection();
                     syncSelectAllCheckbox();
                     return;
@@ -867,26 +1035,40 @@
 
                 const eventIds = events.map(e => e.id);
                 const eventMap = events.reduce((acc, e) => ({ ...acc, [e.id]: e }), {});
+                const searchTerm = document.getElementById('search-participants').value.trim();
+                const eventIdFilter = document.getElementById('participants-event-filter').value;
+                const from = (participantsPage - 1) * participantsPageSize;
+                const to = from + participantsPageSize - 1;
 
-                const { data: participants, error } = await supabase
+                let query = supabase
                     .from('participantes')
-                    .select('*')
+                    .select('id, evento_id, nome, whatsapp, numero_inscricao, criado_em', { count: 'exact' })
                     .in('evento_id', eventIds)
                     .order('criado_em', { ascending: false });
 
+                if (eventIdFilter) query = query.eq('evento_id', eventIdFilter);
+                if (searchTerm) query = query.or(`nome.ilike.%${searchTerm}%,whatsapp.ilike.%${searchTerm}%`);
+
+                const { data: participants, error, count } = await query.range(from, to);
+
                 if (error) throw error;
 
+                participantsTotalCount = count || 0;
                 allParticipants = participants.map(p => ({
                     ...p,
                     evento_nome: eventMap[p.evento_id]?.nome || 'Desconhecido'
                 }));
-
+                filteredParticipants = [...allParticipants];
                 pruneSelectedParticipants();
-                applyParticipantFilters();
-                totalCountSpan.textContent = filteredParticipants.length;
+                renderParticipants(filteredParticipants);
+                totalCountSpan.textContent = String(participantsTotalCount);
+                updateParticipantsPaginationUI();
+                saveUIState();
 
             } catch (err) {
                 console.error("Error loading participants:", err);
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
             }
         };
 
@@ -898,6 +1080,7 @@
             
             if (list.length === 0) {
                 emptyState.classList.remove('hidden');
+                document.getElementById('participants-pagination').classList.add('hidden');
                 return;
             }
             
@@ -980,7 +1163,8 @@
                     if (error) throw error;
                     allParticipants = allParticipants.filter(p => p.id !== participantId);
                     selectedParticipantIds.delete(participantId);
-                    applyParticipantFilters();
+                    invalidateCachePrefix(`eventos_${currentUser.id}`);
+                    await applyParticipantFilters();
                     await loadEvents();
                     showToast('Participante excluido com sucesso.', 'success');
                 }
@@ -988,32 +1172,53 @@
         };
 
         const exportVisibleParticipantsCsv = () => {
-            if (filteredParticipants.length === 0) {
-                showToast('Nao ha participantes visiveis para exportar.', 'info');
-                return;
-            }
+            (async () => {
+                const searchTerm = document.getElementById('search-participants').value.trim();
+                const eventIdFilter = document.getElementById('participants-event-filter').value;
+                const eventIds = coordinatorEvents.map(e => e.id);
+                const eventMap = coordinatorEvents.reduce((acc, e) => ({ ...acc, [e.id]: e.nome }), {});
 
-            const header = ['Nome', 'Telefone', 'Numero de Inscricao', 'Evento', 'Data'];
-            const lines = [
-                header.map(toCsvCell).join(','),
-                ...filteredParticipants.map(p => [
-                    p.nome,
-                    p.whatsapp || '',
-                    `#${String(p.numero_inscricao || 0).padStart(3, '0')}`,
-                    p.evento_nome || 'Desconhecido',
-                    formatDate(p.criado_em)
-                ].map(toCsvCell).join(','))
-            ];
+                let query = supabase
+                    .from('participantes')
+                    .select('evento_id, nome, whatsapp, numero_inscricao, criado_em')
+                    .in('evento_id', eventIds)
+                    .order('criado_em', { ascending: false });
 
-            const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `participantes_${new Date().toISOString().slice(0, 10)}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
+                if (eventIdFilter) query = query.eq('evento_id', eventIdFilter);
+                if (searchTerm) query = query.or(`nome.ilike.%${searchTerm}%,whatsapp.ilike.%${searchTerm}%`);
+
+                const { data, error } = await query;
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    showToast('Nao ha participantes visiveis para exportar.', 'info');
+                    return;
+                }
+
+                const header = ['Nome', 'Telefone', 'Numero de Inscricao', 'Evento', 'Data'];
+                const lines = [
+                    header.map(toCsvCell).join(','),
+                    ...data.map(p => [
+                        p.nome,
+                        p.whatsapp || '',
+                        `#${String(p.numero_inscricao || 0).padStart(3, '0')}`,
+                        eventMap[p.evento_id] || 'Desconhecido',
+                        formatDate(p.criado_em)
+                    ].map(toCsvCell).join(','))
+                ];
+
+                const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `participantes_${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            })().catch((err) => {
+                console.error('Erro ao exportar CSV:', err);
+                showToast('Erro ao exportar CSV.', 'error');
+            });
         };
 
         const deleteSelectedParticipants = async () => {
@@ -1027,7 +1232,8 @@
                 const idSet = new Set(ids);
                 allParticipants = allParticipants.filter(p => !idSet.has(p.id));
                 clearSelection();
-                applyParticipantFilters();
+                invalidateCachePrefix(`eventos_${currentUser.id}`);
+                await applyParticipantFilters();
                 await loadEvents();
                 showToast('Participantes excluidos com sucesso.', 'success');
             });
@@ -1039,9 +1245,9 @@
             if (error) throw error;
             allParticipants = allParticipants.filter(p => p.evento_id !== pendingClearEventId);
             clearSelection();
-            applyParticipantFilters();
-            await loadEvents();
-            await loadParticipants();
+            invalidateCachePrefix(`eventos_${currentUser.id}`);
+            await applyParticipantFilters();
+            await Promise.all([loadEvents(), loadParticipants()]);
             showToast('Inscritos do evento removidos com sucesso.', 'success');
         };
 
@@ -1061,11 +1267,11 @@
                     <div class="prize-image-preview w-20 h-20 shrink-0 rounded-xl border border-dashed border-slate-300 bg-white flex items-center justify-center text-[10px] text-slate-400 font-bold overflow-hidden">Sem foto</div>
                     <div class="flex-1 space-y-2">
                         <input type="text" placeholder="Nome do Parceiro" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-partner">
-                        <input type="text" placeholder="Descrição do Prêmio" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-desc">
+                        <input type="text" placeholder="DescriÃƒÂ§ÃƒÂ£o do PrÃƒÂªmio" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-desc">
                         <input type="file" accept="image/*" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 prize-image-input">
                     </div>
-                    <button type="button" class="text-red-400 hover:text-red-600 mt-1 transition-colors remove-prize" title="Remover prêmio">
-                        🗑️
+                    <button type="button" class="text-red-400 hover:text-red-600 mt-1 transition-colors remove-prize" title="Remover prÃƒÂªmio">
+                        Ã°Å¸â€”â€˜Ã¯Â¸
                     </button>
                 </div>
             `;
@@ -1080,7 +1286,7 @@
                     previewEl.innerHTML = 'Sem foto';
                     return;
                 }
-                previewEl.innerHTML = `<img src="${image}" alt="Foto do prêmio" class="w-full h-full object-cover">`;
+                previewEl.innerHTML = `<img loading="lazy" src="${image}" alt="Foto do prÃƒÂªmio" class="w-full h-full object-cover">`;
             };
             renderPrizePreview(imageBase64);
 
@@ -1088,7 +1294,7 @@
                 const file = e.target.files?.[0];
                 if (!file) return;
                 if (file.size > 2 * 1024 * 1024) {
-                    showToast('Imagem do prêmio deve ter no máximo 2MB.', 'error');
+                    showToast('Imagem do prÃƒÂªmio deve ter no mÃƒÂ¡ximo 2MB.', 'error');
                     e.target.value = '';
                     return;
                 }
@@ -1109,13 +1315,13 @@
 
             if (mode === 'edit') {
                 title.textContent = 'Editar Evento';
-                subtitle.textContent = 'Atualize as informações do sorteio';
-                submitText.textContent = 'SALVAR ALTERAÇÕES';
+                subtitle.textContent = 'Atualize as informaÃƒÂ§ÃƒÂµes do sorteio';
+                submitText.textContent = 'SALVAR ALTERAÃƒâ€¡Ãƒâ€¢ES';
                 return;
             }
 
             title.textContent = 'Novo Evento';
-            subtitle.textContent = 'Configuração do Sorteio';
+            subtitle.textContent = 'ConfiguraÃƒÂ§ÃƒÂ£o do Sorteio';
             submitText.textContent = 'CRIAR EVENTO AGORA';
         };
 
@@ -1186,11 +1392,11 @@
         window.openEditEventModal = async (eventId) => {
             try {
                 console.log('[openEditEventModal] start', { eventId, userId: currentUser?.id });
-                if (!currentUser?.id) throw new Error('Sessão inválida. Faça login novamente.');
+                if (!currentUser?.id) throw new Error('SessÃƒÂ£o invÃƒÂ¡lida. FaÃƒÂ§a login novamente.');
 
                 const { data: eventData, error: eventError, status: eventStatus } = await supabase
                     .from('eventos')
-                    .select('*')
+                    .select('id, nome, slug, descricao, imagem_capa, max_numeros, status, coordenador_id')
                     .eq('id', eventId)
                     .eq('coordenador_id', currentUser.id)
                     .maybeSingle();
@@ -1205,23 +1411,18 @@
                         eventId,
                         userId: currentUser.id
                     });
-                    throw new Error('Não foi possível carregar esse evento.');
+                    throw new Error('NÃƒÂ£o foi possÃƒÂ­vel carregar esse evento.');
                 }
                 if (eventData.status === 'sorteado') {
-                    showToast('Eventos já sorteados não podem ser editados.', 'info');
+                    showToast('Eventos jÃƒÂ¡ sorteados nÃƒÂ£o podem ser editados.', 'info');
                     return;
                 }
 
                 let prizesData = [];
-                const { data: pData, error: prizesError, status: prizesStatus } = await supabase
-                    .from('premios')
-                    .select('*')
-                    .eq('evento_id', eventId)
-                    .order('ordem', { ascending: true });
-
-                if (prizesError) {
+                try {
+                    prizesData = await getEventPrizesCached(eventId);
+                } catch (prizesError) {
                     console.error('[openEditEventModal] premios query error', {
-                        status: prizesStatus,
                         message: prizesError?.message,
                         details: prizesError?.details,
                         hint: prizesError?.hint,
@@ -1230,7 +1431,6 @@
                     });
                     throw prizesError;
                 }
-                prizesData = pData || [];
 
                 console.log('[openEditEventModal] success', { eventId, prizes: prizesData.length });
                 openModal({ mode: 'edit', eventData, prizes: prizesData });
@@ -1255,7 +1455,7 @@
                 return;
             }
             if (file.size > 2 * 1024 * 1024) {
-                showToast('Imagem de capa deve ter no máximo 2MB.', 'error');
+                showToast('Imagem de capa deve ter no mÃƒÂ¡ximo 2MB.', 'error');
                 e.target.value = '';
                 return;
             }
@@ -1286,8 +1486,8 @@
                 const desc = document.getElementById('event-desc').value;
                 const max = parseInt(document.getElementById('event-max').value);
 
-                if (!slugInput) throw new Error("O slug é obrigatório.");
-                if (!currentUser) throw new Error("Usuário não autenticado. Tente fazer login novamente.");
+                if (!slugInput) throw new Error("O slug ÃƒÂ© obrigatÃƒÂ³rio.");
+                if (!currentUser) throw new Error("UsuÃƒÂ¡rio nÃƒÂ£o autenticado. Tente fazer login novamente.");
 
                 const prizeRows = document.querySelectorAll('.prize-row');
                 const prizePayload = Array.from(prizeRows)
@@ -1297,7 +1497,7 @@
                         if (!partner && !pDesc) return null; // Skip empty rows
                         return {
                             nome_parceiro: partner || 'Parceiro',
-                            descricao: pDesc || 'Prêmio Surpresa',
+                            descricao: pDesc || 'PrÃƒÂªmio Surpresa',
                             imagem: row.dataset.image || null,
                             ordem: index + 1
                         };
@@ -1328,12 +1528,12 @@
                     if (eventError) {
                         console.error("Detailed DB Update Error:", eventError);
                         if (eventError.message.includes('unique')) {
-                            throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
+                            throw new Error("Este Identificador da URL (Slug) jÃƒÂ¡ estÃƒÂ¡ em uso por outro evento seu.");
                         }
                         throw new Error(`Erro do Supabase (${eventError.code}): ${eventError.message}`);
                     }
 
-                    if (!updatedEvent) throw new Error("O servidor não retornou os dados do evento atualizado.");
+                    if (!updatedEvent) throw new Error("O servidor nÃƒÂ£o retornou os dados do evento atualizado.");
                     savedEventId = updatedEvent.id;
 
                     // Replace current prize configuration for this event.
@@ -1363,10 +1563,10 @@
                     if (eventError) {
                         console.error("Detailed DB Insert Error:", eventError);
                         if (eventError.message.includes('unique')) {
-                            throw new Error("Este Identificador da URL (Slug) já está em uso por outro evento seu.");
+                            throw new Error("Este Identificador da URL (Slug) jÃƒÂ¡ estÃƒÂ¡ em uso por outro evento seu.");
                         }
                         if (eventError.code === '42501') {
-                            throw new Error("Permissão negada (RLS). Verifique se as Tabelas e as Políticas de Segurança (Policies) foram criadas corretamente no painel do Supabase.");
+                            throw new Error("PermissÃƒÂ£o negada (RLS). Verifique se as Tabelas e as PolÃƒÂ­ticas de SeguranÃƒÂ§a (Policies) foram criadas corretamente no painel do Supabase.");
                         }
                         if (eventError.code === '23503') {
                             throw new Error("Erro de integridade (Foreign Key). Certifique-se de que seu perfil de coordenador foi criado corretamente.");
@@ -1374,7 +1574,7 @@
                         throw new Error(`Erro do Supabase (${eventError.code}): ${eventError.message}`);
                     }
                     
-                    if (!createdEvent) throw new Error("O servidor não retornou os dados do evento criado.");
+                    if (!createdEvent) throw new Error("O servidor nÃƒÂ£o retornou os dados do evento criado.");
                     savedEventId = createdEvent.id;
                 }
 
@@ -1386,17 +1586,18 @@
                     const { error: prizesError } = await supabase.from('premios').insert(prizesToInsert);
                     if (prizesError) {
                         console.error("Prizes Insert Error:", prizesError);
-                        console.warn("Evento salvo, mas erro nos prêmios:", prizesError.message);
+                        console.warn("Evento salvo, mas erro nos prÃƒÂªmios:", prizesError.message);
                     }
                 }
 
                 console.log("Submission complete success!");
+                invalidateCachePrefix(`eventos_${currentUser.id}`);
+                if (savedEventId) invalidateCachePrefix(`premios_${savedEventId}`);
                 closeModal();
-                await loadEvents();
-                await loadParticipants();
+                await Promise.all([loadEvents(), loadParticipants()]);
                 showToast(editingEventId ? 'Evento atualizado com sucesso!' : 'Evento criado com sucesso!', 'success');
             } catch (err) {
-                console.error("Erro fatal na submissão:", err);
+                console.error("Erro fatal na submissÃƒÂ£o:", err);
                 errorBox.textContent = err.message || "Erro inesperado ao salvar. Verifique o console ou tente novamente.";
                 errorBox.classList.remove('hidden');
                 showToast(err.message || 'Erro ao salvar evento.', 'error');
@@ -1463,7 +1664,7 @@
         document.getElementById('connection-status').addEventListener('click', () => {
             const alert = document.getElementById('db-error-alert');
             const stText = document.querySelector('.status-text').textContent;
-            if (stText === 'Erro de Conexão') {
+            if (stText === 'Erro de ConexÃƒÂ£o') {
                 alert.classList.toggle('hidden');
             }
         });
@@ -1472,9 +1673,9 @@
         window.copyToClipboard = async (text, btn) => {
             try {
                 await navigator.clipboard.writeText(text);
-                showToast('Link copiado para a área de transferência.', 'success');
+                showToast('Link copiado para a ÃƒÂ¡rea de transferÃƒÂªncia.', 'success');
             } catch (err) {
-                showToast('Não foi possível copiar o link.', 'error');
+                showToast('NÃƒÂ£o foi possÃƒÂ­vel copiar o link.', 'error');
             }
         };
 
@@ -1486,13 +1687,20 @@
             }
         });
 
-        document.getElementById('search-participants').addEventListener('input', applyParticipantFilters);
-        document.getElementById('participants-event-filter').addEventListener('change', applyParticipantFilters);
+        document.getElementById('search-participants').addEventListener('input', () => {
+            if (participantsSearchDebounce) clearTimeout(participantsSearchDebounce);
+            participantsSearchDebounce = setTimeout(() => {
+                applyParticipantFilters({ resetPage: true, showSpinner: true });
+            }, 400);
+        });
+        document.getElementById('participants-event-filter').addEventListener('change', () => {
+            applyParticipantFilters({ resetPage: true });
+        });
         document.getElementById('btn-export-participants-csv').addEventListener('click', exportVisibleParticipantsCsv);
         document.getElementById('btn-delete-selected').addEventListener('click', deleteSelectedParticipants);
         document.getElementById('btn-cancel-selection').addEventListener('click', () => {
             clearSelection();
-            applyParticipantFilters();
+            applyParticipantFilters({ resetPage: false });
         });
 
         document.getElementById('participants-select-all').addEventListener('change', (e) => {
@@ -1503,6 +1711,16 @@
                 visibleIds.forEach(id => selectedParticipantIds.delete(id));
             }
             renderParticipants(filteredParticipants);
+        });
+        document.getElementById('participants-prev-page').addEventListener('click', async () => {
+            if (participantsPage <= 1) return;
+            participantsPage -= 1;
+            await loadParticipants();
+        });
+        document.getElementById('participants-next-page').addEventListener('click', async () => {
+            if (participantsPage >= participantsTotalPages) return;
+            participantsPage += 1;
+            await loadParticipants();
         });
 
         document.getElementById('btn-cancel-delete-modal').addEventListener('click', closeDeleteConfirmModal);
@@ -1546,6 +1764,11 @@
             }
         });
 
+        window.addEventListener('beforeunload', saveUIState);
+        window.addEventListener('scroll', () => {
+            if (currentView === 'participants') saveUIState();
+        }, { passive: true });
+
         // Init
         setCoverPreview(null);
         addPrizeRow();
@@ -1555,5 +1778,6 @@
     </script>
 </body>
 </html>
+
 
 

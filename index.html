@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SorteioFácil - Coordenador</title>
+    <title>SorteioFÃ¡cil - Coordenador</title>
     <link rel="stylesheet" href="/src/index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                 </svg>
             </div>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">SorteioFácil</h1>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">SorteioFÃ¡cil</h1>
             <p class="text-slate-500 mt-3 font-medium text-lg italic opacity-80">Simplificando seus sorteios</p>
         </div>
 
@@ -39,7 +39,7 @@
                 </div>
                 <div class="group">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-blue-600 transition-colors">Sua Senha</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all">
+                    <input type="password" id="login-password" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all">
                 </div>
                 <button type="submit" id="btn-login" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-[1.5rem] shadow-2xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center">
                     <span>ACESSAR DASHBOARD</span>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="group">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-blue-600 transition-colors">Defina uma Senha</label>
-                    <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all">
+                    <input type="password" id="reg-password" required minlength="6" placeholder="MÃ­nimo 6 caracteres" class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all">
                 </div>
                 <button type="submit" id="btn-register" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-[1.5rem] shadow-2xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center">
                     <span>CRIAR CONTA AGORA</span>
@@ -76,20 +76,7 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-        // Robust environment variable access
-        const getEnv = (key) => {
-            if (typeof window !== 'undefined' && window[key]) return window[key];
-            if (typeof process !== 'undefined' && process.env && process.env[key]) return process.env[key];
-            if (typeof import.meta.env !== 'undefined' && import.meta.env[key]) return import.meta.env[key];
-            return null;
-        };
-
-        const SUPABASE_URL = getEnv('VITE_SUPABASE_URL');
-        const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY');
-
-        const isDefaultKey = (url, key) => !url || url.includes('your-project') || !key || key.includes('your-anon-key');
+        import { SUPABASE_URL, SUPABASE_ANON_KEY, isDefaultKey, getSupabaseClient } from '/src/supabase-client.js';
 
         if (isDefaultKey(SUPABASE_URL, SUPABASE_ANON_KEY)) {
             document.body.innerHTML = `
@@ -98,15 +85,15 @@
                         <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
-                        <h1 class="text-2xl font-black text-slate-800 mb-2 leading-tight">Configuração Necessária</h1>
-                        <p class="text-slate-500 text-sm mb-6">As chaves do Supabase não foram encontradas no ambiente de execução.</p>
+                        <h1 class="text-2xl font-black text-slate-800 mb-2 leading-tight">ConfiguraÃ§Ã£o NecessÃ¡ria</h1>
+                        <p class="text-slate-500 text-sm mb-6">As chaves do Supabase nÃ£o foram encontradas no ambiente de execuÃ§Ã£o.</p>
                         <div class="bg-slate-50 p-6 rounded-2xl text-left border border-slate-100 mb-8">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 italic">Como resolver:</p>
                             <ol class="text-xs text-slate-600 space-y-3 leading-relaxed">
-                                <li class="flex gap-2"><span>1.</span><span>Abra o menu <b>Settings</b> (ícone da engrenagem à esquerda).</span></li>
+                                <li class="flex gap-2"><span>1.</span><span>Abra o menu <b>Settings</b> (Ã­cone da engrenagem Ã  esquerda).</span></li>
                                 <li class="flex gap-2"><span>2.</span><span>Adicione <b>VITE_SUPABASE_URL</b> com sua URL do projeto.</span></li>
-                                <li class="flex gap-2"><span>3.</span><span>Adicione <b>VITE_SUPABASE_ANON_KEY</b> com sua chave anônima.</span></li>
-                                <li class="flex gap-2"><span>4.</span><span>Aplique as mudanças e o app irá reiniciar.</span></li>
+                                <li class="flex gap-2"><span>3.</span><span>Adicione <b>VITE_SUPABASE_ANON_KEY</b> com sua chave anÃ´nima.</span></li>
+                                <li class="flex gap-2"><span>4.</span><span>Aplique as mudanÃ§as e o app irÃ¡ reiniciar.</span></li>
                             </ol>
                         </div>
                     </div>
@@ -115,7 +102,7 @@
             throw new Error("Supabase configuration missing");
         }
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = getSupabaseClient();
 
         // Check Connection
         const checkConn = async () => {
@@ -132,7 +119,7 @@
             } catch (err) {
                 console.error("Connection Check Failed:", err);
                 dot.classList.replace('bg-slate-200', 'bg-red-400');
-                text.textContent = 'Indisponível';
+                text.textContent = 'IndisponÃ­vel';
                 text.classList.replace('text-slate-300', 'text-red-500');
                 
                 if (err.message?.includes('supabaseUrl is required') || err.message?.includes('Invalid Key')) {
@@ -231,7 +218,7 @@
             // Auth signup ok: now use the user ID returned by Supabase Auth to create profile row.
             const signedUserId = data?.user?.id;
             if (!signedUserId) {
-                showError('Conta criada parcialmente, mas não foi possível identificar o usuário. Tente fazer login.');
+                showError('Conta criada parcialmente, mas nÃ£o foi possÃ­vel identificar o usuÃ¡rio. Tente fazer login.');
                 resetRegisterButton();
                 return;
             }
@@ -257,12 +244,12 @@
             }
 
             if (profileSaveFailed) {
-                alert(`Conta criada no Auth com sucesso. Não foi possível salvar o perfil agora (${profileErrorMessage}). Você será redirecionado para o dashboard.`);
+                alert(`Conta criada no Auth com sucesso. NÃ£o foi possÃ­vel salvar o perfil agora (${profileErrorMessage}). VocÃª serÃ¡ redirecionado para o dashboard.`);
             } else {
                 alert('Conta criada com sucesso! Redirecionando para o dashboard.');
             }
 
-            // Mesmo se o perfil falhar, a conta Auth já existe. Redirecionar conforme solicitado.
+            // Mesmo se o perfil falhar, a conta Auth jÃ¡ existe. Redirecionar conforme solicitado.
             window.location.href = '/dashboard.html';
         });
 
