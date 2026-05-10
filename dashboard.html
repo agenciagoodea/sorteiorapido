@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .modal { transition: opacity 0.25s ease; }
@@ -140,18 +141,41 @@
                         <button onclick="document.getElementById('open-create-modal').click()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100">Criar agora &rarr;</button>
                     </div>
                 </div>
-
                 <!-- Participants View -->
                 <div id="view-participants-content" class="hidden">
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                        <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-50/50">
-                            <div class="relative w-full md:w-96">
-                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </span>
-                                <input type="text" id="search-participants" placeholder="Buscar por nome ou celular..." class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm">
+                    <div class="relative bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                        <div id="participants-bulk-bar" class="hidden sticky top-2 z-10 mx-4 mt-4 bg-slate-900 text-white rounded-2xl px-4 py-3 shadow-2xl">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                <p class="text-sm font-bold"><span id="participants-selected-count">0</span> participante(s) selecionado(s)</p>
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <button id="btn-delete-selected" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all">
+                                        <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
+                                        <span>Excluir selecionados</span>
+                                    </button>
+                                    <button id="btn-cancel-selection" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all">
+                                        <i data-lucide="x" class="w-4 h-4 text-white"></i>
+                                        <span>Cancelar selecao</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
+                        </div>
+                        <div class="p-6 border-b border-slate-100 flex flex-col xl:flex-row gap-4 items-stretch xl:items-center justify-between bg-slate-50/50">
+                            <div class="flex flex-col md:flex-row gap-3 w-full">
+                                <div class="relative w-full md:max-w-sm">
+                                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </span>
+                                    <input type="text" id="search-participants" placeholder="Buscar por nome ou celular..." class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm">
+                                </div>
+                                <select id="participants-event-filter" class="w-full md:w-64 px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-semibold text-sm text-slate-700">
+                                    <option value="">Todos os eventos</option>
+                                </select>
+                                <button id="btn-export-participants-csv" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="download" class="w-4 h-4 text-white"></i>
+                                    <span>Exportar CSV</span>
+                                </button>
+                            </div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-4 py-2 rounded-lg border border-slate-100 shadow-sm whitespace-nowrap">
                                 Total: <span id="total-participants-count" class="text-blue-600">0</span> Inscritos
                             </div>
                         </div>
@@ -159,11 +183,14 @@
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="bg-slate-50/50">
+                                        <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-14">
+                                            <input id="participants-select-all" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                        </th>
                                         <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Participante</th>
                                         <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Evento</th>
-                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Números</th>
-                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Inscrição</th>
-                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100"></th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Numeros</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Inscricao</th>
+                                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Acoes</th>
                                     </tr>
                                 </thead>
                                 <tbody id="participants-table-body" class="divide-y divide-slate-50">
@@ -290,6 +317,44 @@
         </div>
     </div>
 
+    <div id="delete-confirm-modal" class="hidden fixed inset-0 z-[70]">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" data-close-delete-modal></div>
+        <div class="relative h-full flex items-center justify-center p-4">
+            <div class="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-2xl p-6">
+                <h4 class="text-lg font-black text-slate-800">Confirmar exclusao</h4>
+                <p id="delete-confirm-message" class="text-sm text-slate-600 mt-2 leading-relaxed"></p>
+                <div class="mt-6 flex items-center justify-end gap-2">
+                    <button id="btn-cancel-delete-modal" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all">Cancelar</button>
+                    <button id="btn-confirm-delete-modal" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-all flex items-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
+                        <span>Excluir</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="clear-event-modal" class="hidden fixed inset-0 z-[70]">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" data-close-clear-modal></div>
+        <div class="relative h-full flex items-center justify-center p-4">
+            <div class="w-full max-w-lg bg-white rounded-3xl border border-slate-200 shadow-2xl p-6">
+                <h4 class="text-lg font-black text-slate-800">Limpar inscritos do evento</h4>
+                <p id="clear-event-message" class="text-sm text-slate-600 mt-2 leading-relaxed"></p>
+                <div class="mt-4">
+                    <label class="text-[11px] font-black uppercase tracking-widest text-slate-400">Digite CONFIRMAR</label>
+                    <input id="clear-event-confirm-input" type="text" class="mt-2 w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none text-sm font-semibold">
+                </div>
+                <div class="mt-6 flex items-center justify-end gap-2">
+                    <button id="btn-cancel-clear-event" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all">Cancelar</button>
+                    <button id="btn-confirm-clear-event" disabled class="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-sm transition-all opacity-40 cursor-not-allowed flex items-center gap-2">
+                        <i data-lucide="triangle-alert" class="w-4 h-4 text-white"></i>
+                        <span>Limpar inscritos</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed bottom-4 right-4 z-[60] space-y-2 w-[92vw] max-w-sm"></div>
 
     <!-- Scripts -->
@@ -332,9 +397,14 @@
 
         let currentUser = null;
         let allParticipants = [];
+        let filteredParticipants = [];
+        let coordinatorEvents = [];
+        let selectedParticipantIds = new Set();
         let currentView = 'events';
         let editingEventId = null;
         let currentCoverBase64 = null;
+        let pendingDeleteAction = null;
+        let pendingClearEventId = null;
 
         const showToast = (message, type = 'info') => {
             const container = document.getElementById('toast-container');
@@ -390,6 +460,97 @@
             preview.classList.add('p-0');
             preview.innerHTML = `<img src="${base64}" class="w-full h-full object-cover" alt="Capa do evento">`;
         };
+
+        const escapeHtml = (value = '') => String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const toCsvCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+
+        const closeAllEventMenus = () => {
+            document.querySelectorAll('[id^="event-menu-"]').forEach(menu => menu.classList.add('hidden'));
+        };
+
+        window.toggleEventMenu = (eventId, ev) => {
+            if (ev) ev.stopPropagation();
+            const menu = document.getElementById(`event-menu-${eventId}`);
+            if (!menu) return;
+            const willOpen = menu.classList.contains('hidden');
+            closeAllEventMenus();
+            if (willOpen) menu.classList.remove('hidden');
+        };
+
+        const pruneSelectedParticipants = () => {
+            const validIds = new Set(allParticipants.map(p => p.id));
+            selectedParticipantIds = new Set([...selectedParticipantIds].filter(id => validIds.has(id)));
+        };
+
+        const updateBulkSelectionBar = () => {
+            const bar = document.getElementById('participants-bulk-bar');
+            const countEl = document.getElementById('participants-selected-count');
+            const selectedCount = selectedParticipantIds.size;
+            countEl.textContent = String(selectedCount);
+            bar.classList.toggle('hidden', selectedCount === 0);
+        };
+
+        const syncSelectAllCheckbox = () => {
+            const checkbox = document.getElementById('participants-select-all');
+            if (!checkbox) return;
+            const visibleIds = filteredParticipants.map(p => p.id);
+            const selectedVisible = visibleIds.filter(id => selectedParticipantIds.has(id)).length;
+            checkbox.disabled = visibleIds.length === 0;
+            checkbox.checked = visibleIds.length > 0 && selectedVisible === visibleIds.length;
+            checkbox.indeterminate = selectedVisible > 0 && selectedVisible < visibleIds.length;
+        };
+
+        const clearSelection = () => {
+            selectedParticipantIds.clear();
+            syncSelectAllCheckbox();
+            updateBulkSelectionBar();
+            document.querySelectorAll('.participant-select-row').forEach(input => { input.checked = false; });
+        };
+
+        const openDeleteConfirmModal = (message, onConfirm) => {
+            const modal = document.getElementById('delete-confirm-modal');
+            document.getElementById('delete-confirm-message').textContent = message;
+            pendingDeleteAction = onConfirm;
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-active');
+        };
+
+        const closeDeleteConfirmModal = () => {
+            pendingDeleteAction = null;
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        };
+
+        const openClearEventModal = (eventId) => {
+            const eventData = coordinatorEvents.find(e => e.id === eventId);
+            if (!eventData) {
+                showToast('Evento nao encontrado para limpeza.', 'error');
+                return;
+            }
+            pendingClearEventId = eventId;
+            document.getElementById('clear-event-message').textContent = `Digite CONFIRMAR para apagar todos os participantes de "${eventData.nome}".`;
+            const input = document.getElementById('clear-event-confirm-input');
+            input.value = '';
+            const confirmBtn = document.getElementById('btn-confirm-clear-event');
+            confirmBtn.disabled = true;
+            confirmBtn.classList.add('opacity-40', 'cursor-not-allowed');
+            document.getElementById('clear-event-modal').classList.remove('hidden');
+            document.body.classList.add('modal-active');
+        };
+
+        const closeClearEventModal = () => {
+            pendingClearEventId = null;
+            document.getElementById('clear-event-modal').classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        };
+
+        window.openClearParticipantsModal = openClearEventModal;
 
         // Check Auth
         const checkSession = async () => {
@@ -538,6 +699,7 @@
                     .order('criado_em', { ascending: false });
 
                 if (error) throw error;
+                coordinatorEvents = events || [];
 
                 grid.innerHTML = '';
                 
@@ -577,36 +739,47 @@
 
                     const config = statusConfig[event.status] || { class: 'bg-slate-100 text-slate-600', label: event.status };
                     const publicURL = `${window.location.origin}/evento.html?slug=${event.slug}`;
-                    const progress = Math.min(100, Math.round(((partCount || 0) / event.max_numeros) * 100));
-                    const progressFilled = Math.max(0, Math.min(10, Math.round(progress / 10)));
-                    const progressBarText = `${'▓'.repeat(progressFilled)}${'░'.repeat(10 - progressFilled)}`;
+                    const maxNumbers = Number(event.max_numeros) || 0;
+                    const inscritos = Number(partCount) || 0;
+                    const fillPct = maxNumbers > 0 ? Math.min(100, Math.max(0, (inscritos / maxNumbers) * 100)) : 0;
+                    const progressColor = fillPct > 80 ? 'bg-red-500' : fillPct >= 50 ? 'bg-amber-500' : 'bg-emerald-500';
                     const cover = event.imagem_capa || '';
                     const coverHtml = cover
                         ? `<img src="${cover}" alt="Capa do evento" class="w-full h-full object-cover">`
                         : `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold cover-upload-preview">Sem capa</div>`;
 
                     card.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-0">
-                            <div class="h-[180px] md:h-full md:min-h-[230px]">${coverHtml}</div>
-                            <div class="p-5 sm:p-6 flex flex-col gap-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-0">
+                            <div class="h-[180px] lg:h-full lg:min-h-[230px]">${coverHtml}</div>
+                            <div class="p-4 lg:p-6 flex flex-col gap-4 min-w-0">
                                 <div class="flex items-start justify-between gap-3">
                                     <span class="px-3 py-1 ${config.class} text-[11px] font-extrabold rounded-full tracking-wide">${config.label}</span>
-                                    <span class="text-xs text-slate-500 font-semibold">criado em ${formatDate(event.criado_em)}</span>
+                                    <div class="relative">
+                                        <button onclick="toggleEventMenu('${event.id}', event)" class="w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-all flex items-center justify-center">
+                                            <i data-lucide="ellipsis-vertical" class="w-4 h-4"></i>
+                                        </button>
+                                        <div id="event-menu-${event.id}" class="hidden absolute right-0 mt-2 min-w-52 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden z-20">
+                                            <button onclick="openClearParticipantsModal('${event.id}')" class="w-full px-3 py-2.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                                <i data-lucide="triangle-alert" class="w-4 h-4 text-red-600"></i>
+                                                <span>Limpar inscritos</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
-                                    <h3 class="text-2xl font-black text-slate-800 leading-tight">${event.nome}</h3>
+                                    <h3 class="text-2xl font-black text-slate-800 leading-tight break-words">${event.nome}</h3>
                                     <p class="text-slate-500 text-sm mt-1 line-clamp-2">${event.descricao || 'Nenhuma descrição fornecida.'}</p>
+                                    <p class="text-xs text-slate-500 font-semibold mt-2">criado em ${formatDate(event.criado_em)}</p>
                                 </div>
 
                                 <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200">
                                     <div class="flex items-center justify-between text-xs font-semibold text-slate-600 mb-2">
                                         <span>Inscrições</span>
-                                        <span>${partCount || 0}/${event.max_numeros}</span>
                                     </div>
                                     <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
-                                        <div class="h-full bg-blue-600 transition-all duration-700" style="width: ${progress}%"></div>
+                                        <div class="h-full ${progressColor} transition-all duration-700" style="width: ${fillPct}%"></div>
                                     </div>
-                                    <p class="text-xs font-mono text-slate-500">${progressBarText} ${partCount || 0}/${event.max_numeros}</p>
+                                    <p class="text-xs font-mono text-slate-500">${inscritos}/${maxNumbers} inscritos</p>
                                 </div>
 
                                 <div class="flex items-center justify-between text-xs text-slate-600">
@@ -616,11 +789,11 @@
 
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-auto">
                                     ${event.status === 'encerrado' ? `
-                                        <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="col-span-2 sm:col-span-1 bg-blue-900 hover:bg-blue-950 text-white py-2.5 rounded-xl font-bold text-sm transition-all">🎲 Sortear</button>
+                                        <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="col-span-2 sm:col-span-1 bg-blue-900 hover:bg-blue-950 text-white py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"><i data-lucide="dice-5" class="w-4 h-4 text-white"></i><span>Sortear</span></button>
                                     ` : ''}
-                                    <button onclick="openEditEventModal('${event.id}')" class="col-span-1 bg-slate-200 hover:bg-slate-300 text-slate-800 py-2.5 rounded-xl font-bold text-sm transition-all">✏️ Editar</button>
-                                    <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all">📊 Dados</button>
-                                    <button onclick="copyToClipboard('${publicURL}', this)" class="col-span-2 sm:col-span-1 bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all">🔗 Copiar Link</button>
+                                    <button onclick="openEditEventModal('${event.id}')" class="col-span-1 bg-slate-600 hover:bg-slate-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"><i data-lucide="square-pen" class="w-4 h-4 text-white"></i><span>Editar</span></button>
+                                    <button onclick="window.location.href='/evento-admin.html?id=${event.id}'" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-white"></i><span>Dados</span></button>
+                                    <button onclick="copyToClipboard('${publicURL}', this)" class="col-span-2 sm:col-span-1 bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"><i data-lucide="link-2" class="w-4 h-4 text-white"></i><span>Copiar Link</span></button>
                                 </div>
                             </div>
                         </div>
@@ -628,10 +801,43 @@
                     grid.appendChild(card);
                 }
 
+                if (window.lucide) window.lucide.createIcons();
+
                 updateStats(events.length, totalParts, totalPrizes);
             } catch (err) {
                 console.error("Error loading events:", err);
             }
+        };
+
+        const buildEventFilterOptions = (events = []) => {
+            const filter = document.getElementById('participants-event-filter');
+            const selectedValue = filter.value;
+            const options = ['<option value="">Todos os eventos</option>']
+                .concat(events.map(event => `<option value="${event.id}">${escapeHtml(event.nome)}</option>`))
+                .join('');
+            filter.innerHTML = options;
+            if ([...filter.options].some(opt => opt.value === selectedValue)) {
+                filter.value = selectedValue;
+            }
+        };
+
+        const applyParticipantFilters = () => {
+            const term = document.getElementById('search-participants').value.trim().toLowerCase();
+            const eventId = document.getElementById('participants-event-filter').value;
+
+            filteredParticipants = allParticipants.filter(p => {
+                const termMatch = p.nome.toLowerCase().includes(term)
+                    || (p.whatsapp || '').toLowerCase().includes(term)
+                    || p.evento_nome.toLowerCase().includes(term);
+                const eventMatch = !eventId || p.evento_id === eventId;
+                return termMatch && eventMatch;
+            });
+
+            pruneSelectedParticipants();
+            renderParticipants(filteredParticipants);
+            document.getElementById('total-participants-count').textContent = String(filteredParticipants.length);
+            syncSelectAllCheckbox();
+            updateBulkSelectionBar();
         };
 
         const loadParticipants = async () => {
@@ -643,18 +849,24 @@
                 // Fetch all events for this coordinator first
                 const { data: events } = await supabase
                     .from('eventos')
-                    .select('id, nome')
+                    .select('id, nome, max_numeros')
                     .eq('coordenador_id', currentUser.id);
+                coordinatorEvents = events || [];
+                buildEventFilterOptions(coordinatorEvents);
                 
                 if (!events || events.length === 0) {
+                    allParticipants = [];
+                    filteredParticipants = [];
                     tableBody.innerHTML = '';
                     totalCountSpan.textContent = '0';
                     emptyState.classList.remove('hidden');
+                    clearSelection();
+                    syncSelectAllCheckbox();
                     return;
                 }
 
                 const eventIds = events.map(e => e.id);
-                const eventMap = events.reduce((acc, e) => ({ ...acc, [e.id]: e.nome }), {});
+                const eventMap = events.reduce((acc, e) => ({ ...acc, [e.id]: e }), {});
 
                 const { data: participants, error } = await supabase
                     .from('participantes')
@@ -666,11 +878,12 @@
 
                 allParticipants = participants.map(p => ({
                     ...p,
-                    evento_nome: eventMap[p.evento_id] || 'Desconhecido'
+                    evento_nome: eventMap[p.evento_id]?.nome || 'Desconhecido'
                 }));
 
-                renderParticipants(allParticipants);
-                totalCountSpan.textContent = allParticipants.length;
+                pruneSelectedParticipants();
+                applyParticipantFilters();
+                totalCountSpan.textContent = filteredParticipants.length;
 
             } catch (err) {
                 console.error("Error loading participants:", err);
@@ -695,21 +908,28 @@
                 tr.className = 'hover:bg-slate-50/50 transition-colors group';
                 
                 const date = new Date(p.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const safeName = escapeHtml(p.nome || 'Participante');
+                const safeWhatsapp = escapeHtml(p.whatsapp || '-');
+                const safeEventName = escapeHtml(p.evento_nome || 'Desconhecido');
+                const isSelected = selectedParticipantIds.has(p.id) ? 'checked' : '';
                 
                 tr.innerHTML = `
+                    <td class="px-4 py-4 text-center align-top">
+                        <input type="checkbox" data-id="${p.id}" class="participant-select-row w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 mt-1" ${isSelected}>
+                    </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">
-                                ${p.nome.charAt(0)}
+                                ${safeName.charAt(0)}
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-slate-800">${p.nome}</p>
-                                <p class="text-[10px] text-slate-400 font-medium">${p.whatsapp || '-'}</p>
+                                <p class="text-sm font-bold text-slate-800">${safeName}</p>
+                                <p class="text-[10px] text-slate-400 font-medium">${safeWhatsapp}</p>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">${p.evento_nome}</span>
+                        <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">${safeEventName}</span>
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex flex-wrap justify-center gap-1">
@@ -720,25 +940,110 @@
                         ${date}
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="window.open('https://wa.me/55${(p.whatsapp || '').replace(/\\D/g, '')}', '_blank')" class="p-2 text-slate-300 hover:text-green-500 transition-all transform hover:scale-110" title="Conversar no WhatsApp">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.208 1.888-4.208 4.208 0 .744.192 1.44.528 2.053l-.561 2.053 2.103-.551a4.17 4.17 0 0 0 2.139.589c2.32 0 4.208-1.888 4.208-4.208s-1.888-4.208-4.208-4.208zm2.492 6.003c-.102.284-.592.541-.812.576-.22.035-.436.059-.728-.035-.292-.094-1.246-.46-2.373-1.465-.877-.784-1.469-1.753-1.641-2.046-.172-.293-.018-.452.129-.597.132-.131.293-.341.44-.511.146-.171.195-.284.293-.474.098-.189.049-.356-.024-.499-.073-.142-.656-1.581-.899-2.164-.236-.566-.475-.49-.656-.499-.17-.009-.366-.01-.561-.01-.195 0-.512.073-.78.366-.268.293-1.024 1-1.024 2.439 0 1.439 1.049 2.829 1.195 3.024.146.195 2.064 3.151 5.001 4.417.699.301 1.244.481 1.669.616.702.223 1.341.191 1.846.116.564-.084 1.732-.707 1.976-1.39.244-.683.244-1.268.171-1.39-.073-.122-.268-.195-.561-.341z"/></svg>
+                        <button onclick="requestDeleteParticipant('${p.id}')" class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-700 text-white transition-all" title="Excluir participante">
+                            <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
                         </button>
                     </td>
                 `;
                 tableBody.appendChild(tr);
             });
+
+            tableBody.querySelectorAll('.participant-select-row').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const id = e.target.dataset.id;
+                    if (e.target.checked) {
+                        selectedParticipantIds.add(id);
+                    } else {
+                        selectedParticipantIds.delete(id);
+                    }
+                    syncSelectAllCheckbox();
+                    updateBulkSelectionBar();
+                });
+            });
+
+            if (window.lucide) window.lucide.createIcons();
+            syncSelectAllCheckbox();
+            updateBulkSelectionBar();
         };
 
-        // Search logic
-        document.getElementById('search-participants').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allParticipants.filter(p => 
-                p.nome.toLowerCase().includes(term) || 
-                (p.whatsapp || '').includes(term) ||
-                p.evento_nome.toLowerCase().includes(term)
+        window.requestDeleteParticipant = (participantId) => {
+            const participant = allParticipants.find(p => p.id === participantId);
+            if (!participant) {
+                showToast('Participante nao encontrado.', 'error');
+                return;
+            }
+            const formattedNumber = `#${String(participant.numero_inscricao || 0).padStart(3, '0')}`;
+            openDeleteConfirmModal(
+                `Tem certeza que deseja excluir ${participant.nome}? O numero ${formattedNumber} sera liberado.`,
+                async () => {
+                    const { error } = await supabase.from('participantes').delete().eq('id', participantId);
+                    if (error) throw error;
+                    allParticipants = allParticipants.filter(p => p.id !== participantId);
+                    selectedParticipantIds.delete(participantId);
+                    applyParticipantFilters();
+                    await loadEvents();
+                    showToast('Participante excluido com sucesso.', 'success');
+                }
             );
-            renderParticipants(filtered);
-        });
+        };
+
+        const exportVisibleParticipantsCsv = () => {
+            if (filteredParticipants.length === 0) {
+                showToast('Nao ha participantes visiveis para exportar.', 'info');
+                return;
+            }
+
+            const header = ['Nome', 'Telefone', 'Numero de Inscricao', 'Evento', 'Data'];
+            const lines = [
+                header.map(toCsvCell).join(','),
+                ...filteredParticipants.map(p => [
+                    p.nome,
+                    p.whatsapp || '',
+                    `#${String(p.numero_inscricao || 0).padStart(3, '0')}`,
+                    p.evento_nome || 'Desconhecido',
+                    formatDate(p.criado_em)
+                ].map(toCsvCell).join(','))
+            ];
+
+            const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `participantes_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        };
+
+        const deleteSelectedParticipants = async () => {
+            const ids = [...selectedParticipantIds];
+            if (ids.length === 0) return;
+
+            const label = ids.length === 1 ? '1 participante selecionado' : `${ids.length} participantes selecionados`;
+            openDeleteConfirmModal(`Tem certeza que deseja excluir ${label}?`, async () => {
+                const { error } = await supabase.from('participantes').delete().in('id', ids);
+                if (error) throw error;
+                const idSet = new Set(ids);
+                allParticipants = allParticipants.filter(p => !idSet.has(p.id));
+                clearSelection();
+                applyParticipantFilters();
+                await loadEvents();
+                showToast('Participantes excluidos com sucesso.', 'success');
+            });
+        };
+
+        const clearParticipantsFromEvent = async () => {
+            if (!pendingClearEventId) return;
+            const { error } = await supabase.from('participantes').delete().eq('evento_id', pendingClearEventId);
+            if (error) throw error;
+            allParticipants = allParticipants.filter(p => p.evento_id !== pendingClearEventId);
+            clearSelection();
+            applyParticipantFilters();
+            await loadEvents();
+            await loadParticipants();
+            showToast('Inscritos do evento removidos com sucesso.', 'success');
+        };
 
         const updateStats = (totalEvents, totalParts, totalPrizes) => {
             document.getElementById('stat-total-events').textContent = totalEvents;
@@ -880,29 +1185,62 @@
 
         window.openEditEventModal = async (eventId) => {
             try {
-                const { data: eventData, error: eventError } = await supabase
+                console.log('[openEditEventModal] start', { eventId, userId: currentUser?.id });
+                if (!currentUser?.id) throw new Error('Sessão inválida. Faça login novamente.');
+
+                const { data: eventData, error: eventError, status: eventStatus } = await supabase
                     .from('eventos')
-                    .select('id, nome, slug, descricao, imagem_capa, max_numeros, status, coordenador_id')
+                    .select('*')
                     .eq('id', eventId)
                     .eq('coordenador_id', currentUser.id)
-                    .single();
+                    .maybeSingle();
 
-                if (eventError || !eventData) throw new Error('Não foi possível carregar esse evento.');
+                if (eventError || !eventData) {
+                    console.error('[openEditEventModal] evento query error', {
+                        status: eventStatus,
+                        message: eventError?.message,
+                        details: eventError?.details,
+                        hint: eventError?.hint,
+                        code: eventError?.code,
+                        eventId,
+                        userId: currentUser.id
+                    });
+                    throw new Error('Não foi possível carregar esse evento.');
+                }
                 if (eventData.status === 'sorteado') {
                     showToast('Eventos já sorteados não podem ser editados.', 'info');
                     return;
                 }
 
-                const { data: prizesData, error: prizesError } = await supabase
+                let prizesData = [];
+                const { data: pData, error: prizesError, status: prizesStatus } = await supabase
                     .from('premios')
-                    .select('nome_parceiro, descricao, imagem, ordem')
+                    .select('*')
                     .eq('evento_id', eventId)
                     .order('ordem', { ascending: true });
 
-                if (prizesError) throw prizesError;
-                openModal({ mode: 'edit', eventData, prizes: prizesData || [] });
+                if (prizesError) {
+                    console.error('[openEditEventModal] premios query error', {
+                        status: prizesStatus,
+                        message: prizesError?.message,
+                        details: prizesError?.details,
+                        hint: prizesError?.hint,
+                        code: prizesError?.code,
+                        eventId
+                    });
+                    throw prizesError;
+                }
+                prizesData = pData || [];
+
+                console.log('[openEditEventModal] success', { eventId, prizes: prizesData.length });
+                openModal({ mode: 'edit', eventData, prizes: prizesData });
             } catch (err) {
-                console.error('Erro ao abrir edição do evento:', err);
+                console.error('[openEditEventModal] fatal', {
+                    message: err?.message,
+                    stack: err?.stack,
+                    eventId,
+                    userId: currentUser?.id
+                });
                 showToast(err.message || 'Erro ao carregar dados do evento.', 'error');
             }
         };
@@ -1134,23 +1472,88 @@
         window.copyToClipboard = async (text, btn) => {
             try {
                 await navigator.clipboard.writeText(text);
-                const oldText = btn.textContent;
-                btn.textContent = '✅ Copiado';
-                setTimeout(() => {
-                    btn.textContent = oldText;
-                }, 1200);
                 showToast('Link copiado para a área de transferência.', 'success');
             } catch (err) {
                 showToast('Não foi possível copiar o link.', 'error');
             }
         };
 
+        document.addEventListener('click', (ev) => {
+            const clickedMenuButton = ev.target.closest('button[onclick*="toggleEventMenu"]');
+            const clickedMenu = ev.target.closest('[id^="event-menu-"]');
+            if (!clickedMenuButton && !clickedMenu) {
+                closeAllEventMenus();
+            }
+        });
+
+        document.getElementById('search-participants').addEventListener('input', applyParticipantFilters);
+        document.getElementById('participants-event-filter').addEventListener('change', applyParticipantFilters);
+        document.getElementById('btn-export-participants-csv').addEventListener('click', exportVisibleParticipantsCsv);
+        document.getElementById('btn-delete-selected').addEventListener('click', deleteSelectedParticipants);
+        document.getElementById('btn-cancel-selection').addEventListener('click', () => {
+            clearSelection();
+            applyParticipantFilters();
+        });
+
+        document.getElementById('participants-select-all').addEventListener('change', (e) => {
+            const visibleIds = filteredParticipants.map(p => p.id);
+            if (e.target.checked) {
+                visibleIds.forEach(id => selectedParticipantIds.add(id));
+            } else {
+                visibleIds.forEach(id => selectedParticipantIds.delete(id));
+            }
+            renderParticipants(filteredParticipants);
+        });
+
+        document.getElementById('btn-cancel-delete-modal').addEventListener('click', closeDeleteConfirmModal);
+        document.querySelector('[data-close-delete-modal]').addEventListener('click', closeDeleteConfirmModal);
+        document.getElementById('btn-confirm-delete-modal').addEventListener('click', async (e) => {
+            if (!pendingDeleteAction) return;
+            const btn = e.currentTarget;
+            try {
+                setButtonLoading(btn, true, 'Excluindo...');
+                await pendingDeleteAction();
+                closeDeleteConfirmModal();
+            } catch (err) {
+                console.error('Erro ao excluir participante(s):', err);
+                showToast(err.message || 'Erro ao excluir participante(s).', 'error');
+            } finally {
+                setButtonLoading(btn, false);
+            }
+        });
+
+        document.getElementById('btn-cancel-clear-event').addEventListener('click', closeClearEventModal);
+        document.querySelector('[data-close-clear-modal]').addEventListener('click', closeClearEventModal);
+        document.getElementById('clear-event-confirm-input').addEventListener('input', (e) => {
+            const isValid = e.target.value.trim() === 'CONFIRMAR';
+            const confirmBtn = document.getElementById('btn-confirm-clear-event');
+            confirmBtn.disabled = !isValid;
+            confirmBtn.classList.toggle('opacity-40', !isValid);
+            confirmBtn.classList.toggle('cursor-not-allowed', !isValid);
+        });
+        document.getElementById('btn-confirm-clear-event').addEventListener('click', async (e) => {
+            if (e.currentTarget.disabled) return;
+            const btn = e.currentTarget;
+            try {
+                setButtonLoading(btn, true, 'Limpando...');
+                await clearParticipantsFromEvent();
+                closeClearEventModal();
+            } catch (err) {
+                console.error('Erro ao limpar inscritos do evento:', err);
+                showToast(err.message || 'Erro ao limpar inscritos do evento.', 'error');
+            } finally {
+                setButtonLoading(btn, false, 'Limpar inscritos');
+            }
+        });
+
         // Init
         setCoverPreview(null);
         addPrizeRow();
+        if (window.lucide) window.lucide.createIcons();
         checkSession();
 
     </script>
 </body>
 </html>
+
 

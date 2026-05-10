@@ -205,12 +205,16 @@
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
             const btn = document.getElementById('btn-register');
+            const resetRegisterButton = () => {
+                btn.disabled = false;
+                btn.querySelector('span').textContent = 'CRIAR CONTA AGORA';
+            };
 
             btn.disabled = true;
             btn.querySelector('span').textContent = 'Criando conta...';
             errorMsg.classList.add('hidden');
 
-            const { data, error } = await supabase.auth.signUp({ 
+            const { data, error } = await supabase.auth.signUp({
                 email, 
                 password,
                 options: {
@@ -220,23 +224,46 @@
 
             if (error) {
                 showError(error.message);
-                btn.disabled = false;
-                btn.querySelector('span').textContent = 'Criar Minha Conta';
-            } else {
-                // Insert into coordenadores table
-                const { error: insertError } = await supabase
-                    .from('coordenadores')
-                    .insert([{ id: data.user.id, nome: name, email: email }]);
-
-                if (insertError) {
-                    showError("Conta criada, mas erro ao salvar perfil: " + insertError.message);
-                    btn.disabled = false;
-                    btn.querySelector('span').textContent = 'Criar Minha Conta';
-                } else {
-                    alert("Conta criada com sucesso! Verifique seu email ou tente logar.");
-                    tabLogin.click();
-                }
+                resetRegisterButton();
+                return;
             }
+
+            // Auth signup ok: now use the user ID returned by Supabase Auth to create profile row.
+            const signedUserId = data?.user?.id;
+            if (!signedUserId) {
+                showError('Conta criada parcialmente, mas não foi possível identificar o usuário. Tente fazer login.');
+                resetRegisterButton();
+                return;
+            }
+
+            let profileSaveFailed = false;
+            let profileErrorMessage = '';
+
+            const { error: insertError } = await supabase
+                .from('coordenadores')
+                .insert([{ id: signedUserId, nome: name, email }]);
+
+            if (insertError) {
+                profileSaveFailed = true;
+                profileErrorMessage = insertError.message || 'erro desconhecido';
+                console.error('[signup] falha ao salvar perfil em coordenadores', {
+                    userId: signedUserId,
+                    email,
+                    code: insertError.code,
+                    message: insertError.message,
+                    details: insertError.details,
+                    hint: insertError.hint
+                });
+            }
+
+            if (profileSaveFailed) {
+                alert(`Conta criada no Auth com sucesso. Não foi possível salvar o perfil agora (${profileErrorMessage}). Você será redirecionado para o dashboard.`);
+            } else {
+                alert('Conta criada com sucesso! Redirecionando para o dashboard.');
+            }
+
+            // Mesmo se o perfil falhar, a conta Auth já existe. Redirecionar conforme solicitado.
+            window.location.href = '/dashboard.html';
         });
 
         // Check session

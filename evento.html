@@ -80,7 +80,7 @@
                 <div class="mt-8 max-w-2xl mx-auto bg-white/10 rounded-2xl border border-white/20 backdrop-blur-sm p-4 text-left">
                     <div class="flex items-center justify-between mb-2 text-sm font-semibold">
                         <span id="slots-label">0 vagas restantes</span>
-                        <span id="slots-progress-text">0/0</span>
+                        <span id="slots-progress-text">0/0 inscritos</span>
                     </div>
                     <div class="w-full h-3 bg-white/20 rounded-full overflow-hidden">
                         <div id="slots-progress" class="h-full bg-emerald-400 transition-all duration-700" style="width:0%"></div>
@@ -98,8 +98,8 @@
                         <input id="part-name" required type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="Digite seu nome">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">WhatsApp</label>
-                        <input id="part-whatsapp" required type="tel" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="(99) 99999-9999">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Telefone</label>
+                        <input id="part-phone" required type="tel" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" placeholder="(99) 99999-9999">
                     </div>
                     <button id="btn-submit" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-black transition-all flex items-center justify-center gap-2">
                         🎟️ Garantir meu número!
@@ -221,7 +221,7 @@
 
             progressEl.style.width = `${Math.max(0, Math.min(100, usedPct))}%`;
             labelEl.textContent = `${vagasRestantes} vagas restantes`;
-            textEl.textContent = `${inscritos}/${currentEvent.max_numeros}`;
+            textEl.textContent = `${inscritos}/${currentEvent.max_numeros} inscritos`;
 
             progressEl.className = 'h-full transition-all duration-700 ' + (availablePct > 50 ? 'bg-emerald-500' : availablePct >= 20 ? 'bg-amber-500' : 'bg-red-500');
 
@@ -346,9 +346,32 @@
             }, 20000);
         };
 
-        document.getElementById('part-whatsapp').addEventListener('input', (e) => {
+        document.getElementById('part-phone').addEventListener('input', (e) => {
             e.target.value = maskPhoneInput(e.target.value);
         });
+
+        const getRandomAvailableNumber = async (eventId, maxNumbers) => {
+            const { data: usedRows, error } = await supabase
+                .from('participantes')
+                .select('numero_inscricao')
+                .eq('evento_id', eventId);
+            if (error) throw error;
+
+            const used = new Set((usedRows || []).map((r) => Number(r.numero_inscricao)).filter((n) => Number.isInteger(n) && n > 0));
+            if (used.size >= maxNumbers) throw new Error('Todas as vagas já foram preenchidas.');
+
+            const maxAttempts = Math.max(50, maxNumbers * 2);
+            for (let i = 0; i < maxAttempts; i++) {
+                const n = Math.floor(Math.random() * maxNumbers) + 1;
+                if (!used.has(n)) return n;
+            }
+
+            for (let n = 1; n <= maxNumbers; n++) {
+                if (!used.has(n)) return n;
+            }
+
+            throw new Error('Não foi possível gerar número de inscrição disponível.');
+        };
 
         document.getElementById('inscription-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -356,9 +379,9 @@
                 setButtonLoading(true);
 
                 const nome = document.getElementById('part-name').value.trim();
-                const whatsapp = document.getElementById('part-whatsapp').value.trim();
-                if (!nome || !whatsapp) {
-                    showToast('Preencha nome e WhatsApp.', 'error');
+                const phone = document.getElementById('part-phone').value.trim();
+                if (!nome || !phone) {
+                    showToast('Preencha nome e Telefone.', 'error');
                     return;
                 }
 
@@ -377,7 +400,7 @@
                     .from('participantes')
                     .select('numero_inscricao')
                     .eq('evento_id', currentEvent.id)
-                    .eq('whatsapp', whatsapp)
+                    .eq('whatsapp', phone)
                     .maybeSingle();
 
                 if (existing?.numero_inscricao) {
@@ -385,18 +408,38 @@
                     return;
                 }
 
-                const { data: created, error } = await supabase
-                    .from('participantes')
-                    .insert([{ evento_id: currentEvent.id, nome, whatsapp }])
-                    .select('numero_inscricao')
-                    .single();
+                let created = null;
+                let insertError = null;
+                const maxRetry = 5;
+                for (let attempt = 0; attempt < maxRetry; attempt++) {
+                    const randomNumber = await getRandomAvailableNumber(currentEvent.id, Number(currentEvent.max_numeros) || 0);
+                    const { data, error } = await supabase
+                        .from('participantes')
+                        .insert([{
+                            evento_id: currentEvent.id,
+                            nome,
+                            whatsapp: phone,
+                            numero_inscricao: randomNumber
+                        }])
+                        .select('numero_inscricao')
+                        .single();
 
-                if (error || !created) throw error || new Error('Falha ao registrar inscrição.');
+                    if (!error && data) {
+                        created = data;
+                        insertError = null;
+                        break;
+                    }
+
+                    insertError = error || new Error('Falha ao registrar inscrição.');
+                    if (!String(insertError?.message || '').toLowerCase().includes('unique')) break;
+                }
+
+                if (!created) throw insertError || new Error('Falha ao registrar inscrição.');
                 showSuccess(created.numero_inscricao);
                 await updateHero();
             } catch (err) {
                 const msg = err?.message || 'Erro ao concluir inscrição.';
-                showToast(msg.includes('unique') ? 'Este WhatsApp já está inscrito.' : msg, 'error');
+                showToast(msg.includes('unique') ? 'Este telefone já está inscrito.' : msg, 'error');
             } finally {
                 setButtonLoading(false);
             }

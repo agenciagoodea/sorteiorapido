@@ -27,9 +27,10 @@ CREATE TABLE IF NOT EXISTS participantes (
   evento_id uuid REFERENCES eventos(id) ON DELETE CASCADE,
   nome text NOT NULL,
   whatsapp text NOT NULL,
-  numero_inscricao serial,
+  numero_inscricao integer,
   criado_em timestamp DEFAULT now(),
-  UNIQUE(evento_id, whatsapp) -- mesmo WhatsApp não pode se inscrever duas vezes no mesmo evento
+  UNIQUE(evento_id, whatsapp), -- mesmo WhatsApp não pode se inscrever duas vezes no mesmo evento
+  UNIQUE(evento_id, numero_inscricao) -- numero de inscrição único por evento
 );
 
 -- Prêmios de cada evento
@@ -73,4 +74,7 @@ CREATE POLICY "part_owner_read" ON participantes FOR SELECT USING (
 -- Safe migrations for existing databases
 ALTER TABLE eventos ADD COLUMN IF NOT EXISTS imagem_capa text;
 ALTER TABLE premios ADD COLUMN IF NOT EXISTS imagem text;
+ALTER TABLE participantes ALTER COLUMN numero_inscricao TYPE integer USING numero_inscricao::integer;
+ALTER TABLE participantes ALTER COLUMN numero_inscricao DROP DEFAULT;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_participantes_evento_numero_inscricao ON participantes (evento_id, numero_inscricao) WHERE numero_inscricao IS NOT NULL;
 
