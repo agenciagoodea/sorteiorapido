@@ -97,92 +97,90 @@
         </div>
     </main>
 
-    <div id="draw-modal" class="hidden fixed inset-0 z-[100] bg-slate-900 text-slate-900 overflow-y-auto">
-        <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+    <div id="draw-modal" class="hidden fixed inset-0 z-[100] bg-slate-900 overflow-y-auto">
+        <!-- GLOBAL BACKGROUND IMAGE -->
+        <img id="draw-modal-bg-img" src="" class="absolute inset-0 w-full h-full object-cover hidden opacity-40">
+        <div id="draw-modal-bg-overlay" class="absolute inset-0 bg-slate-900/60 hidden"></div>
+        
+        <div id="particles" class="absolute inset-0 pointer-events-none z-0"></div>
         <div class="relative z-10 min-h-screen flex flex-col items-center p-4 sm:p-8">
-            <div class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden relative mt-8 mb-8">
+            <div class="w-full max-w-4xl bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden relative mt-8 mb-8 text-white">
                 
-                <!-- HEADER DO SORTEIO -->
-                <div class="relative h-[120px] w-full flex flex-col justify-end p-6">
-                    <img id="draw-header-img" src="" class="absolute inset-0 w-full h-full object-cover hidden" alt="Capa">
-                    <div id="draw-header-bg" class="absolute inset-0 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                    
-                    <div class="relative flex items-end justify-between w-full">
-                        <h2 id="draw-event-name" class="text-3xl font-black text-white line-clamp-1">Nome do Evento</h2>
-                        <button id="btn-close-draw" class="shrink-0 ml-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl backdrop-blur-sm text-sm font-bold transition">Fechar Sorteio</button>
-                    </div>
+                <!-- HEADER DO SORTEIO (GLASS) -->
+                <div class="relative w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:px-10 border-b border-white/10 bg-white/5">
+                    <h2 id="draw-event-name" class="text-3xl font-black text-white line-clamp-1 drop-shadow-md">Nome do Evento</h2>
+                    <button id="btn-close-draw" class="mt-4 sm:mt-0 shrink-0 bg-white/20 hover:bg-white/30 border border-white/10 text-white px-5 py-2.5 rounded-xl backdrop-blur-sm text-sm font-bold transition shadow-sm">Fechar Sorteio</button>
                 </div>
 
-                <!-- PROGRESSO -->
-                <div id="draw-progress-bar-container" class="bg-slate-100 px-6 py-3 border-b border-slate-200">
-                    <div class="flex justify-between text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
+                <!-- PROGRESSO (GLASS) -->
+                <div id="draw-progress-bar-container" class="bg-white/5 px-6 sm:px-10 py-4 border-b border-white/10">
+                    <div class="flex justify-between text-xs font-bold text-white/60 mb-2 uppercase tracking-wider">
                         <span id="draw-progress-text">Prêmio 1 de X</span>
                     </div>
-                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div id="draw-progress-bar" class="h-full bg-amber-500 transition-all duration-500" style="width: 0%"></div>
+                    <div class="w-full h-2 bg-black/20 rounded-full overflow-hidden shadow-inner">
+                        <div id="draw-progress-bar" class="h-full bg-amber-400 transition-all duration-500 shadow-[0_0_10px_rgba(251,191,36,0.8)]" style="width: 0%"></div>
                     </div>
                 </div>
 
                 <div class="p-6 sm:p-10">
                     <!-- STAGE 1: PRIZE -->
                     <div id="stage-prize" class="hidden text-center">
-                        <div class="inline-block bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full text-xs font-black tracking-widest uppercase mb-6" id="badge-prize-number">PRÊMIO 1 DE X</div>
+                        <div class="inline-block bg-white/10 border border-white/20 text-amber-300 px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase mb-6 shadow-sm" id="badge-prize-number">PRÊMIO 1 DE X</div>
                         
-                        <div id="stage-prize-image" class="mx-auto w-[200px] h-[200px] rounded-[2rem] overflow-hidden bg-slate-50 border-4 border-white shadow-xl flex items-center justify-center text-7xl icon-pulse">&#127873;</div>
+                        <div id="stage-prize-image" class="mx-auto w-[200px] h-[200px] rounded-[2rem] overflow-hidden bg-white/5 border-4 border-white/20 shadow-xl flex items-center justify-center text-7xl icon-pulse backdrop-blur-md">&#127873;</div>
                         
-                        <h3 id="stage-prize-partner" class="mt-6 text-4xl font-black text-[#D97706]">Parceiro</h3>
-                        <p id="stage-prize-desc" class="text-xl text-slate-500 mt-2 font-medium">Descrição</p>
+                        <h3 id="stage-prize-partner" class="mt-6 text-4xl font-black text-amber-300 drop-shadow-md">Parceiro</h3>
+                        <p id="stage-prize-desc" class="text-xl text-white/80 mt-2 font-medium">Descrição</p>
                         
                         <div class="mt-10">
-                            <button id="btn-spin" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-black text-xl shadow-lg shadow-blue-600/30 transition transform hover:scale-105">🎲 Girar a Roleta!</button>
+                            <button id="btn-spin" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-white/20 text-white px-10 py-4 rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(79,70,229,0.5)] transition transform hover:scale-105">🎲 Girar a Roleta!</button>
                         </div>
                     </div>
 
                     <!-- STAGE 2: ROULETTE -->
                     <div id="stage-roulette" class="hidden text-center py-10">
-                        <p class="text-sm uppercase tracking-widest text-slate-400 font-bold mb-6">Sorteando ganhador...</p>
-                        <div id="roulette-box" class="mx-auto max-w-sm bg-[#1E293B] border-2 border-blue-500 rounded-3xl p-10 roulette-border-anim shadow-2xl">
-                            <p id="roulette-number" class="text-6xl font-mono text-white font-black tracking-widest">#000</p>
+                        <p class="text-sm uppercase tracking-widest text-blue-200 font-bold mb-6 drop-shadow-md">Sorteando ganhador...</p>
+                        <div id="roulette-box" class="mx-auto max-w-sm bg-black/40 border-2 border-blue-400/50 rounded-3xl p-10 roulette-border-anim shadow-[0_0_30px_rgba(59,130,246,0.3)] backdrop-blur-md">
+                            <p id="roulette-number" class="text-6xl font-mono text-white font-black tracking-widest drop-shadow-lg">#000</p>
                         </div>
                     </div>
 
                     <!-- STAGE 3: WINNER -->
                     <div id="stage-winner" class="hidden">
-                        <div class="bg-gold-gradient rounded-3xl p-6 sm:p-8 shadow-xl border border-amber-200/50">
-                            <p class="text-xs uppercase tracking-widest text-amber-700 font-black mb-6 text-center">🎉 Temos um ganhador!</p>
+                        <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-amber-300/30">
+                            <p class="text-xs uppercase tracking-widest text-amber-300 font-black mb-6 text-center drop-shadow-md">🎉 Temos um ganhador!</p>
                             
                             <div class="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
-                                <div id="winner-prize-image" class="w-[150px] h-[150px] shrink-0 rounded-2xl overflow-hidden bg-white shadow-inner flex items-center justify-center text-5xl border-4 border-white">&#127873;</div>
+                                <div id="winner-prize-image" class="w-[150px] h-[150px] shrink-0 rounded-2xl overflow-hidden bg-black/20 shadow-inner flex items-center justify-center text-5xl border-4 border-amber-300/50">&#127873;</div>
                                 
                                 <div class="flex-1 text-center md:text-left">
-                                    <div class="inline-block bg-white/50 px-4 py-2 rounded-xl mb-3">
-                                        <p id="winner-number" class="text-6xl font-black text-[#D97706] tracking-tighter">#000</p>
+                                    <div class="inline-block bg-black/30 border border-white/10 px-4 py-2 rounded-xl mb-3 shadow-inner">
+                                        <p id="winner-number" class="text-6xl font-black text-amber-400 tracking-tighter drop-shadow-lg">#000</p>
                                     </div>
-                                    <h3 id="winner-name" class="text-3xl font-black text-slate-900 leading-tight">Nome do ganhador</h3>
-                                    <p id="winner-phone" class="text-lg text-amber-800/80 mt-1 font-semibold">(00) 0****-**00</p>
+                                    <h3 id="winner-name" class="text-3xl font-black text-white leading-tight drop-shadow-md">Nome do ganhador</h3>
+                                    <p id="winner-phone" class="text-lg text-amber-200 mt-1 font-semibold drop-shadow-sm">(00) 0****-**00</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="mt-8 text-center">
-                            <button id="btn-next-prize" class="hidden bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-black text-lg transition">Próximo Prêmio &rarr;</button>
+                            <button id="btn-next-prize" class="hidden bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-2xl font-black text-lg transition shadow-lg">Próximo Prêmio &rarr;</button>
                         </div>
                     </div>
 
                     <!-- STAGE 4: FINAL -->
                     <div id="stage-final" class="hidden text-center">
-                        <h3 class="text-3xl font-black text-slate-900 mb-2">🎉 Sorteio Finalizado!</h3>
-                        <p class="text-slate-500 mb-8">Todos os prêmios foram sorteados.</p>
+                        <h3 class="text-3xl font-black text-white mb-2 drop-shadow-lg">🎉 Sorteio Finalizado!</h3>
+                        <p class="text-white/70 mb-8">Todos os prêmios foram sorteados.</p>
                         
-                        <div id="printable-results" class="bg-slate-50 rounded-3xl p-6 border border-slate-200">
+                        <div id="printable-results" class="bg-black/20 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-inner">
                             <div id="final-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-left"></div>
                         </div>
 
                         <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
-                            <button id="btn-export-pdf" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 py-3.5 rounded-xl font-black shadow-sm">🖨️ Imprimir Resumo</button>
-                            <button id="btn-save-results" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-black shadow-lg shadow-emerald-600/20">&#10003; Salvar Resultados</button>
-                            <button id="btn-finish" class="bg-slate-900 hover:bg-black text-white py-3.5 rounded-xl font-black">Fechar Painel</button>
+                            <button id="btn-export-pdf" class="bg-white/10 border border-white/20 hover:bg-white/20 text-white py-3.5 rounded-xl font-black shadow-sm backdrop-blur-sm transition">🖨️ Imprimir Resumo</button>
+                            <button id="btn-save-results" class="bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-400/50 text-white py-3.5 rounded-xl font-black shadow-lg shadow-emerald-500/20 backdrop-blur-sm transition">&#10003; Salvar Resultados</button>
+                            <button id="btn-finish" class="bg-black/40 hover:bg-black/60 border border-white/10 text-white py-3.5 rounded-xl font-black backdrop-blur-sm transition">Fechar Painel</button>
                         </div>
                     </div>
                 </div>
@@ -358,12 +356,12 @@
             
             document.getElementById('draw-event-name').textContent = currentEvent.nome;
             if (currentEvent.imagem_capa) {
-                document.getElementById('draw-header-img').src = currentEvent.imagem_capa;
-                document.getElementById('draw-header-img').classList.remove('hidden');
-                document.getElementById('draw-header-bg').classList.add('hidden');
+                document.getElementById('draw-modal-bg-img').src = currentEvent.imagem_capa;
+                document.getElementById('draw-modal-bg-img').classList.remove('hidden');
+                document.getElementById('draw-modal-bg-overlay').classList.remove('hidden');
             } else {
-                document.getElementById('draw-header-img').classList.add('hidden');
-                document.getElementById('draw-header-bg').classList.remove('hidden');
+                document.getElementById('draw-modal-bg-img').classList.add('hidden');
+                document.getElementById('draw-modal-bg-overlay').classList.add('hidden');
             }
 
             winners = [];
@@ -486,15 +484,15 @@
 
             winners.forEach((winner) => {
                 const card = document.createElement('div');
-                card.className = 'border border-slate-200 rounded-2xl p-4 bg-white shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4';
+                card.className = 'border border-white/10 rounded-2xl p-4 bg-white/5 backdrop-blur-sm shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4';
                 card.innerHTML = `
-                    <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-slate-50 flex items-center justify-center text-3xl border border-slate-100">
-                        ${winner.prizeImage ? `<img src="${winner.prizeImage}" class="w-full h-full object-cover">` : '&#127873;'}
+                    <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-black/20 flex items-center justify-center text-3xl border border-white/10">
+                        ${winner.prizeImage ? `<img src="${winner.prizeImage}" class="w-full h-full object-cover opacity-80">` : '&#127873;'}
                     </div>
                     <div class="flex-1 text-center sm:text-left">
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${winner.prizeName}</p>
-                        <p class="text-xl font-black text-[#D97706] mt-1">#${String(winner.participantNumber || 0).padStart(3, '0')}</p>
-                        <p class="text-sm font-semibold text-slate-800">${winner.participantName}</p>
+                        <p class="text-[10px] text-white/50 font-bold uppercase tracking-widest">${winner.prizeName}</p>
+                        <p class="text-xl font-black text-amber-300 mt-1 drop-shadow-md">#${String(winner.participantNumber || 0).padStart(3, '0')}</p>
+                        <p class="text-sm font-semibold text-white/90">${winner.participantName}</p>
                     </div>
                 `;
                 grid.appendChild(card);
