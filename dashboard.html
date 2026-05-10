@@ -103,12 +103,33 @@
             align-items: center;
             justify-content: center;
         }
+        .upload-btn {
+            border: 2px dashed #CBD5E1;
+            border-radius: 12px;
+            padding: 12px 20px;
+            background: #F8FAFC;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #64748B;
+            font-weight: 600;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+        .upload-btn:hover { border-color: #3B82F6; color: #3B82F6; }
+        .modal-section-title {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #94A3B8;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #F1F5F9;
+            margin-bottom: 12px;
+        }
         @media (min-width: 1024px) {
-            .card-cover-wrap {
-                height: auto;
-                min-height: 230px;
-                border-radius: 12px 0 0 12px;
-            }
+            .card-cover-wrap { height: auto; min-height: 230px; border-radius: 12px 0 0 12px; }
         }
     </style>
 </head>
@@ -324,72 +345,89 @@
     <div id="create-modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
         <div class="modal-overlay absolute w-full h-full bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300"></div>
 
-        <div class="modal-container bg-white w-full max-w-lg mx-auto rounded-[2rem] shadow-2xl z-50 overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-95 opacity-0">
-            <div class="p-10">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tight">Novo Evento</h3>
-                        <p id="modal-subtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configuração do Sorteio</p>
+        <div class="modal-container bg-white w-full max-w-xl mx-4 rounded-[2rem] shadow-2xl z-50 overflow-y-auto max-h-[92vh] transform transition-all duration-300 scale-95 opacity-0">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-8 pt-8 pb-5 border-b border-slate-100">
+                <div>
+                    <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tight">Novo Evento</h3>
+                    <p id="modal-subtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configuração do Sorteio</p>
+                </div>
+                <button class="modal-close w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <form id="create-event-form" class="px-8 pb-8">
+                <div id="modal-error" class="hidden mt-5 p-4 bg-red-50 border border-red-100 text-red-600 text-xs font-bold rounded-xl"></div>
+
+                <!-- SEÇÃO 1: Informações básicas -->
+                <div class="mt-6">
+                    <p class="modal-section-title">Informações básicas</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Nome do Evento</label>
+                            <input type="text" id="event-name" required placeholder="Ex: Sorteio de Boas-vindas" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Slug (URL)</label>
+                            <input type="text" id="event-slug" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-mono text-sm" placeholder="sorteio-exclusivo">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">Descrição</label>
+                            <textarea id="event-desc" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm" placeholder="Detalhes do sorteio..."></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Limite Máximo de Inscrições</label>
+                                <input type="number" id="event-max" required value="100" min="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-bold text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5">Status</label>
+                                <select id="event-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-semibold text-sm text-slate-700">
+                                    <option value="aberto">Aberto</option>
+                                    <option value="encerrado">Encerrado</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <button class="modal-close w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
                 </div>
 
-                <form id="create-event-form" class="space-y-6">
-                    <div id="modal-error" class="hidden p-4 bg-red-50 border border-red-100 text-red-600 text-xs font-bold rounded-xl mb-4"></div>
-
-                    <div class="group">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Nome do Evento</label>
-                        <input type="text" id="event-name" required placeholder="Ex: Sorteio de Boas-vindas" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium">
+                <!-- SEÇÃO 2: Imagem de capa -->
+                <div class="mt-6">
+                    <p class="modal-section-title">Imagem de Capa</p>
+                    <label class="upload-btn">
+                        <input id="event-cover-input" type="file" accept="image/*" hidden>
+                        &#128247; Escolher imagem de capa
+                    </label>
+                    <div id="cover-preview-wrap" class="hidden mt-3 flex items-start gap-3">
+                        <img id="cover-preview-img" src="" alt="Preview" class="rounded-lg object-cover" style="max-height:200px;max-width:100%;border-radius:8px;">
+                        <button type="button" id="btn-remove-cover" class="shrink-0 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-lg border border-red-100 transition-all">&#10005; Remover</button>
                     </div>
+                </div>
 
-                    <div class="group">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Identificador da URL (Slug)</label>
-                        <div class="flex items-center gap-3">
-                            <input type="text" id="event-slug" required class="flex-1 px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-mono text-sm" placeholder="sorteio-exclusivo">
-                        </div>
+                <!-- SEÇÃO 3: Prêmios -->
+                <div class="mt-6">
+                    <div class="flex items-center justify-between modal-section-title">
+                        <span>Prêmios</span>
+                        <button type="button" id="add-prize" class="text-blue-600 font-black text-[10px] uppercase tracking-widest hover:text-blue-700 flex items-center gap-1 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                            Adicionar
+                        </button>
                     </div>
-
-                    <div class="group">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Descrição</label>
-                        <textarea id="event-desc" rows="2" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-medium" placeholder="Detalhes do sorteio..."></textarea>
+                    <div id="prizes-container" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                        <!-- Prizes added here -->
                     </div>
+                </div>
 
-                    <div class="group space-y-2">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Imagem de Capa</label>
-                        <div id="event-cover-preview" class="cover-upload-preview w-full h-40 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center text-slate-400 text-xs font-bold">
-                            Sem imagem de capa
-                        </div>
-                        <input id="event-cover-input" type="file" accept="image/*" class="w-full text-xs bg-white border border-slate-200 rounded-xl p-3">
-                    </div>
-
-                    <div class="group">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Limite Máximo</label>
-                        <input type="number" id="event-max" required value="100" min="1" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 outline-none transition-all font-bold">
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Prêmios</label>
-                            <button type="button" id="add-prize" class="text-blue-600 font-black text-[10px] uppercase tracking-widest hover:text-blue-700 flex items-center gap-1 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                                Adicionar
-                            </button>
-                        </div>
-                        <div id="prizes-container" class="space-y-3 max-h-72 overflow-y-auto pr-1">
-                            <!-- Prizes added here -->
-                        </div>
-                    </div>
-
-                    <button id="modal-submit-btn" type="submit" class="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-blue-900/20 transition-all transform active:scale-95 flex items-center justify-center gap-3 mt-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span id="modal-submit-text">CRIAR EVENTO AGORA</span>
+                <!-- Rodapé do modal -->
+                <div class="mt-7 flex flex-col sm:flex-row gap-3">
+                    <button type="button" class="modal-close sm:flex-none order-2 sm:order-1 px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition-all">Cancelar</button>
+                    <button id="modal-submit-btn" type="submit" class="flex-1 order-1 sm:order-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm rounded-xl shadow-lg shadow-blue-900/15 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        <span id="modal-submit-text">CRIAR EVENTO</span>
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -547,15 +585,16 @@
         };
 
         const setCoverPreview = (base64 = null) => {
-            const preview = document.getElementById('event-cover-preview');
             currentCoverBase64 = base64 || null;
+            const wrap = document.getElementById('cover-preview-wrap');
+            const img = document.getElementById('cover-preview-img');
             if (!base64) {
-                preview.innerHTML = 'Sem imagem de capa';
-                preview.classList.remove('p-0');
+                wrap.classList.add('hidden');
+                img.src = '';
                 return;
             }
-            preview.classList.add('p-0');
-            preview.innerHTML = `<img loading="lazy" src="${base64}" class="w-full h-full object-cover" alt="Capa do evento">`;
+            img.src = base64;
+            wrap.classList.remove('hidden');
         };
 
         const getCache = (key, ttlMs) => {
@@ -1340,18 +1379,23 @@
         const addPrizeRow = (partner = '', description = '', imageBase64 = '') => {
             const container = document.getElementById('prizes-container');
             const div = document.createElement('div');
-            div.className = 'prize-row border border-slate-200 rounded-2xl p-3 bg-slate-50/70';
+            div.className = 'prize-row border border-slate-200 rounded-xl p-3 bg-slate-50/70';
             div.innerHTML = `
-                <div class="flex gap-3 items-start">
-                    <div class="prize-image-preview w-20 h-20 shrink-0 rounded-xl border border-dashed border-slate-300 bg-white flex items-center justify-center text-[10px] text-slate-400 font-bold overflow-hidden">Sem foto</div>
-                    <div class="flex-1 space-y-2">
-                        <input type="text" placeholder="Nome do Parceiro" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-partner">
-                        <input type="text" placeholder="Descrição do Prêmio" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-desc">
-                        <input type="file" accept="image/*" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 prize-image-input">
+                <div class="space-y-2">
+                    <div class="flex gap-2 items-center">
+                        <input type="text" placeholder="Nome do Parceiro" class="flex-1 px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-partner">
+                        <button type="button" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 transition-colors remove-prize" title="Remover">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </button>
                     </div>
-                    <button type="button" class="text-red-400 hover:text-red-600 mt-1 transition-colors remove-prize" title="Remover prêmio">
-                        🗑ï¸
-                    </button>
+                    <input type="text" placeholder="Descrição do Prêmio" class="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-500 prize-desc">
+                    <div class="flex items-center gap-2">
+                        <label class="flex-1 upload-btn" style="padding:8px 12px;font-size:12px">
+                            <input type="file" accept="image/*" hidden class="prize-image-input">
+                            📷 Foto do prêmio
+                        </label>
+                        <div class="prize-image-preview w-[60px] h-[60px] shrink-0 rounded-lg border border-slate-200 bg-white overflow-hidden items-center justify-center text-[10px] text-slate-400 font-bold hidden"></div>
+                    </div>
                 </div>
             `;
             container.appendChild(div);
@@ -1361,11 +1405,10 @@
 
             const previewEl = div.querySelector('.prize-image-preview');
             const renderPrizePreview = (image) => {
-                if (!image) {
-                    previewEl.innerHTML = 'Sem foto';
-                    return;
-                }
-                previewEl.innerHTML = `<img loading="lazy" src="${image}" alt="Foto do prêmio" class="w-full h-full object-cover">`;
+                if (!image) { previewEl.classList.add('hidden'); return; }
+                previewEl.classList.remove('hidden');
+                previewEl.style.display = 'flex';
+                previewEl.innerHTML = `<img loading="lazy" src="${image}" alt="Foto" class="w-full h-full object-cover">`;
             };
             renderPrizePreview(imageBase64);
 
@@ -1382,9 +1425,7 @@
                 renderPrizePreview(base64);
             });
 
-            div.querySelector('.remove-prize').addEventListener('click', () => {
-                if (container.children.length > 1) div.remove();
-            });
+            div.querySelector('.remove-prize').addEventListener('click', () => { div.remove(); });
         };
 
         const setModalMode = (mode) => {
@@ -1433,6 +1474,8 @@
                 document.getElementById('event-slug').value = eventData.slug || '';
                 document.getElementById('event-desc').value = eventData.descricao || '';
                 document.getElementById('event-max').value = eventData.max_numeros || 100;
+                const statusEl = document.getElementById('event-status');
+                if (statusEl) statusEl.value = ['aberto','encerrado'].includes(eventData.status) ? eventData.status : 'aberto';
                 setCoverPreview(eventData.imagem_capa || null);
 
                 if (prizes.length > 0) {
@@ -1529,10 +1572,7 @@
         document.getElementById('add-prize').addEventListener('click', addPrizeRow);
         document.getElementById('event-cover-input').addEventListener('change', async (e) => {
             const file = e.target.files?.[0];
-            if (!file) {
-                setCoverPreview(null);
-                return;
-            }
+            if (!file) { setCoverPreview(null); return; }
             if (file.size > 2 * 1024 * 1024) {
                 showToast('Imagem de capa deve ter no máximo 2MB.', 'error');
                 e.target.value = '';
@@ -1540,6 +1580,10 @@
             }
             const base64 = await fileToBase64(file);
             setCoverPreview(base64);
+        });
+        document.getElementById('btn-remove-cover').addEventListener('click', () => {
+            setCoverPreview(null);
+            document.getElementById('event-cover-input').value = '';
         });
 
         // Slugify helper
@@ -1930,11 +1974,104 @@
             if (currentView === 'participants') saveUIState();
         }, { passive: true });
 
+        // ========== ATIVIDADE RECENTE ==========
+        const activityFeed = [];
+        const MAX_ACTIVITIES = 10;
+
+        const relativeTime = (dateStr) => {
+            const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+            if (diff < 60) return 'agora mesmo';
+            if (diff < 3600) return `h\u00e1 ${Math.floor(diff/60)} min`;
+            if (diff < 86400) return `h\u00e1 ${Math.floor(diff/3600)}h`;
+            return `h\u00e1 ${Math.floor(diff/86400)}d`;
+        };
+
+        const renderActivity = () => {
+            const container = document.getElementById('recent-activity');
+            if (!container) return;
+            if (activityFeed.length === 0) {
+                container.innerHTML = `<div class="p-4 bg-white rounded-xl border border-slate-200 text-center py-10"><p class="text-sm text-slate-400">Nenhuma atividade ainda.</p></div>`;
+                return;
+            }
+            container.innerHTML = activityFeed.map(a => {
+                const icons = {
+                    inscricao: { bg:'bg-blue-100', color:'text-blue-600', svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>' },
+                    evento:    { bg:'bg-emerald-100', color:'text-emerald-600', svg:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' },
+                    sorteio:   { bg:'bg-amber-100', color:'text-amber-600', svg:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>' }
+                };
+                const ic = icons[a.tipo] || icons.inscricao;
+                return `
+                <div class="flex items-start gap-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
+                    <div class="w-8 h-8 shrink-0 rounded-lg ${ic.bg} ${ic.color} flex items-center justify-center">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${ic.svg}</svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-slate-700 leading-tight">${a.texto}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">${relativeTime(a.ts)}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
+        const addActivity = (item) => {
+            activityFeed.unshift(item);
+            if (activityFeed.length > MAX_ACTIVITIES) activityFeed.pop();
+            renderActivity();
+        };
+
+        const loadRecentActivity = async () => {
+            if (!currentUser) return;
+            try {
+                const eventIds = coordinatorEvents.map(e => e.id);
+                if (eventIds.length === 0) { renderActivity(); return; }
+
+                const eventMap = coordinatorEvents.reduce((acc,e) => ({...acc,[e.id]:e.nome}), {});
+
+                const { data: parts } = await supabase
+                    .from('participantes')
+                    .select('id, nome, numero_inscricao, evento_id, criado_em')
+                    .in('evento_id', eventIds)
+                    .order('criado_em', { ascending: false })
+                    .limit(10);
+
+                activityFeed.length = 0;
+                (parts || []).forEach(p => {
+                    activityFeed.push({
+                        tipo: 'inscricao',
+                        texto: `${p.nome} garantiu o #${String(p.numero_inscricao||0).padStart(3,'0')} em ${eventMap[p.evento_id]||'evento'}`,
+                        ts: p.criado_em
+                    });
+                });
+                renderActivity();
+            } catch(e) { console.error('Erro atividade recente:', e); }
+        };
+
+        // Supabase Realtime para novos participantes
+        const startRealtimeActivity = () => {
+            supabase.channel('atividade-recente')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'participantes' }, (payload) => {
+                    const p = payload.new;
+                    const eventMap = coordinatorEvents.reduce((acc,e) => ({...acc,[e.id]:e.nome}), {});
+                    if (!coordinatorEvents.find(e => e.id === p.evento_id)) return;
+                    addActivity({
+                        tipo: 'inscricao',
+                        texto: `${p.nome} garantiu o #${String(p.numero_inscricao||0).padStart(3,'0')} em ${eventMap[p.evento_id]||'evento'}`,
+                        ts: p.criado_em || new Date().toISOString()
+                    });
+                })
+                .subscribe();
+        };
+        // ======= END ATIVIDADE RECENTE =========
+
         // Init
         setCoverPreview(null);
         addPrizeRow();
         if (window.lucide) window.lucide.createIcons();
-        checkSession();
+        checkSession().then(() => {
+            loadRecentActivity();
+            startRealtimeActivity();
+            setInterval(loadRecentActivity, 30000);
+        });
 
     </script>
 </body>
